@@ -2,10 +2,13 @@
 import random
 import time
 import EEGDataGen as dataGen
-import msvcrt
+import msvcrt as keyboard
+import numpy as np
+from Processing import DataReader
 
-def intro(direction):
-    print("Get Ready to Focus on " + direction)
+def intro():
+    print("Get Ready to Focus ")
+    print("Please hit the key 'R' when asked to Enter Right and 'L' for Left")
     index = 5
     while index > 0:
         t0 = time.time()
@@ -17,22 +20,36 @@ def intro(direction):
         index -= 1
         
 
-def inputLoop(direction, focusTime, readIn, fileName):
-    endTime = time.time() + focusTime 
+def inputLoop(dr, fileNameBin, fileNameRaw):
+
+    endTime = time.time() + randomTime() 
+    direction = randomFlag()
             #while true, enter the loop, have a time checker that breaks it, but while doing this if you end up 
             #out of range you need to extend the loop
     while(time.time() < endTime):
+        readIn = []
         print("\nENTER " + direction + "\n")
-        msvcrt.getch()
-        writeFile(direction, fileName, readIn)
-        readIn = randomInput()
-        if not withinRange(readIn):
-            endTime = pause(time.time(), endTime, readIn)
+        keyboard.getch()
+        readIn[0], readIn[1], readIn[2] = dr.get_data()
+        writeFileBin(direction, fileNameBin, readIn)
+        writeFileRaw(direction, fileNameRaw, readIn)
+
             
-def writeFile(direction, fileName, readIn):
-    final = "{0},{1},{2}".format(readIn[0], readIn[1], direction) + "\n"
+def writeFileBin(direction, fileName, readIn):
+    size = np.shape(readIn[2])[1]
+    final = ""
+    for i in range(size):
+        final += str(readIn[:,i])[1:-1]
+        final += ", "
+    final += direction + "\n"
     file = open(fileName, "a")
-    file.write(final)             
+    file.write(final)    
+
+def writeFileRaw(direction, fileName, readIn):
+    final  = direction + ", "
+    final += np.vstack([readIn[0], readIn[1]]) + "\n"
+    file = open(fileName, "a")
+    file.write(final)        
     
 def withinRange(readIn):
     threshold1 = 13
@@ -44,40 +61,35 @@ def withinRange(readIn):
     else: 
         return False
 
-def pause(pauseTime, endTime, readIn):
-    while not withinRange(readIn):
-        readIn = randomInput()
-    return time.time() + endTime - pauseTime
-
 #here for test only
-def randomInput():
-    
-    return random.randint(15, 29), random.randint(15,29)
+def randomFlag():
+    newFlag = random.randint(0, 1)
+    if(newFlag == 0):
+        return "Right"
+    else: 
+        return "Left"
+
+def randomTime():
+    return random.randint(5, 15)
 
 def main():
 
     
-    readIn = [15, 20] #get input from file
-    focusTime = 10
-    readIn[0], readIn[1] = randomInput()
-    fileHeader = "Signal1,Signal1,Word" + "\n" 
-    fileName = dataGen.findEmptyFile("output")
-    file = open(fileName, "w")
+    dr = DataReader(1000)
+    focusTime = 5 * 60
+    finalTime = time.time() + focusTime
+    fileHeader = ",".join(dr.get_names()) + ", direction\n" 
+    fileNameBin = dataGen.findEmptyFile("bin")
+    fileNameRaw = dataGen.findEmptyFile("raw")
+    file = open(fileNameRaw, "w")
     file.write(fileHeader)
     file.close()
-    
-    while(True):
-        
-        readIn[0], readIn[1] = randomInput() 
+    intro()
 
-        if(withinRange(readIn)):
-            direction = "Right"
-            intro(direction)
-            inputLoop(direction, focusTime, readIn, fileName)
-            direction = "Left"
-            intro(direction)
-            inputLoop(direction, focusTime, readIn, fileName)
-            exit()
+    while(time.time() < finalTime):
+        
+            inputLoop(dr, fileNameBin, fileNameRaw)
+
                 
 
 
