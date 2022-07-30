@@ -25,8 +25,8 @@ if "__name__" == "__main__":
         while time_to_wait > 0:
             time_to_wait -= 1
             # read data from get_data()
-            freq, fftData = get_data()
-            predictions = model.predict(freq)
+            freq, fftData, bands = get_data()
+            predictions = model.predict(bands)
 
             print()
             input_direction = input("press R" if direction == 0 else "Press L")

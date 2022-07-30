@@ -32,14 +32,14 @@ def inputLoop(dr, fileNameBin, fileNameRaw):
         keyboard.getch()
         readIn[0], readIn[1], readIn[2] = dr.get_data()
         writeFileBin(direction, fileNameBin, readIn)
-    # writeFileRaw(direction, fileNameRaw, readIn)
+        writeFileRaw(direction, fileNameRaw, readIn)
 
 
 def writeFileBin(direction, fileName, readIn):
     size = 5
     final = ""
     for i in range(size):
-        final += str(np.rint(readIn[2][:, i]))[1:-1].replace(".", "")
+        final += str(readIn[2][i])
         final += ", "
     final += direction + "\n"
     file = open(fileName, "a")
@@ -48,7 +48,7 @@ def writeFileBin(direction, fileName, readIn):
 
 def writeFileRaw(direction, fileName, readIn):
     final = direction + ", "
-    final += np.hstack([readIn[0], readIn[1]]) + "\n"
+    final += np.vstack([readIn[0], readIn[1]]) + "\n"
     file = open(fileName, "a")
     file.write(final)
 
@@ -74,12 +74,12 @@ def randomFlag():
 
 
 def randomTime():
-    return random.randint(2, 7)
+    return random.randint(5, 15)
 
 
 def main():
 
-    dr = DataReader(500)
+    dr = DataReader(1000)
     focusTime = 5 * 60
     finalTime = time.time() + focusTime
     fileHeader = ",".join(dr.get_names()) + ", direction\n"
