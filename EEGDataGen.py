@@ -57,13 +57,14 @@ def findEmptyFile(type):
     return type + str(index) + ".csv"
 
 
+if __name__ == '__main__':
 # COMMANDS
-times = 10
-final = "Signal1,Signal1,Word" + "\n"
-for i in range(0, times):
-    # generateFull("test")
-    final += generateLow("left")
-    final += generateHigh("right")
-fileName = findEmptyFile("BatchTestCSVData")
-file = open(fileName, "w")
-file.write(final)
+    times = 10
+    final = "Signal1,Signal1,Word" + "\n"
+    for i in range(0, times):
+        # generateFull("test")
+        final += generateLow("left")
+        final += generateHigh("right")
+    fileName = findEmptyFile("BatchTestCSVData")
+    file = open(fileName, "w")
+    file.write(final)
