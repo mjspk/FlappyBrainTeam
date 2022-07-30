@@ -12,7 +12,7 @@ imaginery user has had 10 training sessions with each word.
 def generateFull(word):
     global main
     main = ""
-    for i in range(0, 30):
+    for i in range(0, 300):
         lG = randint(3100, 3975)
         hG = randint(4100, 4975)
         main += "{0},{1},{2}".format(lG, hG, word) + "\n"
@@ -23,10 +23,10 @@ def generateFull(word):
 def generateLow(word):
     global main
     main = ""
-    for i in range(0, 30):
+    for i in range(0, 300):
         lG = randint(3100, 3300)
         hG = randint(4100, 4500)
-        main += "{0},{1}".format(lG, hG, word) + "\n"
+        main += "{0},{1},{2}".format(lG, hG, word) + "\n"
     return main
 
 
@@ -34,10 +34,10 @@ def generateLow(word):
 def generateHigh(word):
     global main
     main = ""
-    for i in range(0, 30):
+    for i in range(0, 300):
         lG = randint(3500, 3975)
         hG = randint(4600, 4975)
-        main += "{0},{1}".format(lG, hG, word) + "\n"
+        main += "{0},{1},{2}".format(lG, hG, word) + "\n"
 
     return main
 
