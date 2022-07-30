@@ -68,7 +68,7 @@ class DataReader:
             else:
                 fftData = np.vstack((fftData, fftReading))
                 y, x = fftData.shape
-                fftData = fftData.reshape((x, y))
+                # fftData = fftData.reshape((x, y))
 
             bands = self.create_bands(freq, fftReading)
 
@@ -77,7 +77,7 @@ class DataReader:
             else:
                 bandsData = np.vstack((bandsData, bands))
                 y, x = bandsData.shape
-                bandsData = bandsData.reshape((x, y))
+                #bandsData = bandsData.reshape((x, y))
 
         if plot:
             plt.stem(freq, fftReading, markerfmt=" ")

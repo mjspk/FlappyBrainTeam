@@ -1,10 +1,10 @@
-
 import random
 import time
 import EEGDataGen as dataGen
 import msvcrt as keyboard
 import numpy as np
 from Processing import DataReader
+
 
 def intro():
     print("Get Ready to Focus ")
@@ -13,95 +13,89 @@ def intro():
     while index > 0:
         t0 = time.time()
         print(index)
-        while(True):
+        while True:
             t1 = time.time()
-            if(t1-t0) > 1:
+            if (t1 - t0) > 1:
                 break
         index -= 1
-        
+
 
 def inputLoop(dr, fileNameBin, fileNameRaw):
 
-    endTime = time.time() + randomTime() 
+    endTime = time.time() + randomTime()
     direction = randomFlag()
-            #while true, enter the loop, have a time checker that breaks it, but while doing this if you end up 
-            #out of range you need to extend the loop
-    while(time.time() < endTime):
-        readIn = [0,0,0]
+    # while true, enter the loop, have a time checker that breaks it, but while doing this if you end up
+    # out of range you need to extend the loop
+    while time.time() < endTime:
+        readIn = [0, 0, 0]
         print("\nENTER " + direction + "\n")
         keyboard.getch()
         readIn[0], readIn[1], readIn[2] = dr.get_data()
         writeFileBin(direction, fileNameBin, readIn)
-        writeFileRaw(direction, fileNameRaw, readIn)
+    # writeFileRaw(direction, fileNameRaw, readIn)
 
-            
+
 def writeFileBin(direction, fileName, readIn):
-    size = np.shape(readIn[2])[0]
+    size = 5
     final = ""
     for i in range(size):
-        final += str(readIn[:,i])[1:-1]
+        final += str(np.rint(readIn[2][:, i]))[1:-1].replace(".", "")
         final += ", "
     final += direction + "\n"
     file = open(fileName, "a")
-    file.write(final)    
+    file.write(final)
+
 
 def writeFileRaw(direction, fileName, readIn):
-    final  = direction + ", "
-    final += np.vstack([readIn[0], readIn[1]]) + "\n"
+    final = direction + ", "
+    final += np.hstack([readIn[0], readIn[1]]) + "\n"
     file = open(fileName, "a")
-    file.write(final)        
-    
+    file.write(final)
+
+
 def withinRange(readIn):
     threshold1 = 13
     threshold2 = 29
     input1Valid = readIn[0] > threshold1 and readIn[0] < threshold2
     input2Valid = readIn[1] > threshold1 and readIn[1] < threshold2
-    if(input1Valid and input2Valid):
+    if input1Valid and input2Valid:
         return True
-    else: 
+    else:
         return False
 
-#here for test only
+
+# here for test only
 def randomFlag():
     newFlag = random.randint(0, 1)
-    if(newFlag == 0):
+    if newFlag == 0:
         return "Right"
-    else: 
+    else:
         return "Left"
 
+
 def randomTime():
-    return random.randint(5, 15)
+    return random.randint(2, 7)
+
 
 def main():
 
-    
-    dr = DataReader(1000)
+    dr = DataReader(500)
     focusTime = 5 * 60
     finalTime = time.time() + focusTime
-    fileHeader = ",".join(dr.get_names()) + ", direction\n" 
+    fileHeader = ",".join(dr.get_names()) + ", direction\n"
     fileNameBin = dataGen.findEmptyFile("bin")
     fileNameRaw = dataGen.findEmptyFile("raw")
-    file = open(fileNameRaw, "w")
+    file = open(fileNameBin, "w")
     file.write(fileHeader)
     file.close()
     intro()
 
-    while(time.time() < finalTime):
-        
-            inputLoop(dr, fileNameBin, fileNameRaw)
+    while time.time() < finalTime:
 
-                
+        inputLoop(dr, fileNameBin, fileNameRaw)
 
 
-
-            
-
-
-
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Method call for main: This initializes and completes method calls using the UserInterface and EncryptionProcessor classes to
     # facilitate the execution of the encrytion application.
     main()
