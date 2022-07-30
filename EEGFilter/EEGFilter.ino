@@ -40,7 +40,8 @@ void loop() {
   // Calculate elapsed time
   static unsigned long past = 0;
   unsigned long present = micros();
-  unsigned long interval = present - past;
+  unsigned long interval = present - past; 
+  
   past = present;
 
   // Run timer

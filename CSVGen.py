@@ -27,7 +27,7 @@ def inputLoop(dr, fileNameBin, fileNameRaw):
             #while true, enter the loop, have a time checker that breaks it, but while doing this if you end up 
             #out of range you need to extend the loop
     while(time.time() < endTime):
-        readIn = []
+        readIn = [0,0,0]
         print("\nENTER " + direction + "\n")
         keyboard.getch()
         readIn[0], readIn[1], readIn[2] = dr.get_data()
@@ -36,7 +36,7 @@ def inputLoop(dr, fileNameBin, fileNameRaw):
 
             
 def writeFileBin(direction, fileName, readIn):
-    size = np.shape(readIn[2])[1]
+    size = np.shape(readIn[2])[0]
     final = ""
     for i in range(size):
         final += str(readIn[:,i])[1:-1]
