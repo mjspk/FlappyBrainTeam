@@ -8,7 +8,7 @@ from queue import Queue
 class DataReader:
     def __init__(self, buffer_length):
 
-        self.ser = serial.Serial("COM7", 115200, timeout=0.00001)
+        self.ser = serial.Serial("COM4", 115200, timeout=0.00001)
         self.ser.flushInput()
         self.ser.flushOutput()
 
@@ -19,38 +19,17 @@ class DataReader:
 
     def get_data(self, plot=False):
 
-        # Throw away top line
-        self.ser.readline()
-
-        input_raw = self.ser.readline()
-        input_decoded = input_raw.decode()
-
-        # Read in data until the end of the file
-        while len(input_decoded) > 3 and input_decoded[-3] == ">":
-
-            if input_decoded[0] != "<":
-                input_raw = self.ser.readline()
-                input_decoded = input_raw.decode()
-                continue
-
-            if len(input_raw) > 5:
-                input_string = input_decoded.strip().replace("<", "").replace(">", "")
-                input_s_array = input_string.split()
-                input_list = list(map(float, input_s_array))
-                input_array = np.array(input_list)
-
-                if self.data.full():
-                    self.data.get()
-
-                self.data.put(input_array)
-                # data = np.append(data, input_array.reshape((1,2)), axis = 0)
-
-                input_raw = self.ser.readline()
-                input_decoded = input_raw.decode()
+        self.read_serial()
 
         # Convert the data left in teh queue to a numpy array
+        while not self.data.full():
+
+            time.sleep(0.1)
+            self.read_serial()
+        
         data_array = np.array(self.data.queue)
-        freq = np.fft.fftfreq(data_array.shape[0]) * np.average(data_array[:, 0])
+        freq = np.fft.fftfreq(data_array.shape[0]) * np.average(data_array[0, 0])
+            
         freq = freq[0 : len(freq) // 2]
 
         fftData = None
@@ -67,7 +46,7 @@ class DataReader:
                 fftData = fftReading
             else:
                 fftData = np.vstack((fftData, fftReading))
-                y, x = fftData.shape
+                # y, x = fftData.shape
                 # fftData = fftData.reshape((x, y))
 
             bands = self.create_bands(freq, fftReading)
@@ -76,7 +55,7 @@ class DataReader:
                 bandsData = bands
             else:
                 bandsData = np.vstack((bandsData, bands))
-                y, x = bandsData.shape
+                # y, x = bandsData.shape
                 #bandsData = bandsData.reshape((x, y))
 
         if plot:
@@ -85,6 +64,46 @@ class DataReader:
 
         # Return results of the fourier transform
         return freq, fftData, bandsData
+
+    def read_serial(self):
+
+        # Throw away top line
+        self.ser.readline()
+
+        input_raw = self.ser.readline()
+        input_decoded = input_raw.decode()
+
+        # Read in data until the end of the file
+        # while len(input_decoded) > 3 and input_decoded[-3] == ">":
+        while self.ser.inWaiting() > 1:
+
+            try:
+                if input_decoded[0] != "<" or input_decoded[-3] != ">":
+                    input_raw = self.ser.readline()
+                    input_decoded = input_raw.decode()
+                    continue
+
+                if len(input_raw) > 5:
+                    input_string = input_decoded.strip().replace("<", "").replace(">", "")
+                    input_s_array = input_string.split()
+                    input_list = list(map(float, input_s_array))
+                    input_array = np.array(input_list)
+
+                    if len(input_array) == 3:
+
+                        if self.data.full():
+                            self.data.get()
+
+                        self.data.put(input_array)
+
+                    input_raw = self.ser.readline()
+                    input_decoded = input_raw.decode()
+
+            except:
+                print("exception")
+                input_raw = self.ser.readline()
+                input_decoded = input_raw.decode()
+
 
     def get_names(self):
         return self.bin_names
@@ -133,6 +152,9 @@ if __name__ == "__main__":
     while True:
 
         frequencies, amplitudes, bands = dr.get_data()
+
+        y, x = bands.shape
+        bands = bands.reshape((x,y))
 
         plt.cla()
         bar = plt.bar(bin_names, bands[:, 0], color="#7967e1")
