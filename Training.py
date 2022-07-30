@@ -28,10 +28,13 @@ def split_data(data):
         y_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), -1]
         x_test = data.iloc[int(len(data) * 0.9) :, :-1]
         y_test = data.iloc[int(len(data) * 0.9) :, -1]
-        scaler = StandardScaler()
-        x_train = scaler.transform(x_train)
-        x_val = scaler.transform(x_val)
-        x_test = scaler.transform(x_test)
+        scaler=StandardScaler()
+        scaler.fit(x_train)
+        x_train=scaler.transform(x_train)
+        x_val=scaler.transform(x_val)
+        print(x_train)
+        print(x_val)
+        
 
         return x_train, y_train, x_val, y_val, x_test, y_test
 
@@ -41,7 +44,7 @@ def split_data(data):
 
 
 def create_model():
-    inputs = keras.Input(shape=(9,), name="digits")
+    inputs = keras.Input(shape=(5,), name="digits")
     x = layers.Dense(64, activation="relu", name="dense_1")(inputs)
     # x = layers.Dense(128, activation="relu", name="dense_2")(x)
     # x = layers.Dense(256, activation="relu", name="dense_3")(x)
@@ -123,7 +126,7 @@ def load_model(filename="EEGmodel.h5"):
 
 
 if __name__ == "__main__":
-    data = load_data("BatchTestCSVData1.csv")
+    data = load_data("BatchTestCSVData2.csv")
     x_train, y_train, x_val, y_val, x_test, y_test = split_data(data)
     model = load_model()
     if model is None:
