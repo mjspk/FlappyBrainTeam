@@ -7,12 +7,13 @@ from queue import Queue
 class DataReader():
 
     def __init__(self, buffer_length):
-        self.ser = serial.Serial("COM4", 9600, timeout = .001)
+        self.ser = serial.Serial("COM4", 115200, timeout = .001)
         time.sleep(1)
         self.ser.flushInput()
         self.ser.flushOutput()
         self.data = Queue(buffer_length)
         self.bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
+        self.bands = [4, 8, 12, 30, 100]
 
     def get_data(self, plot = False):
         
@@ -53,31 +54,33 @@ class DataReader():
         fftData = fftData[0:len(fftData)//2]
         freq = freq[0:len(freq)//2]
 
+        bands = self.create_bands(freq, fftData)
+
         if plot:
             plt.stem(freq, fftData, markerfmt=" ")
             plt.show(block = True)
 
         # Return results of the fourier transform
-        return freq, fftData
+        return freq, fftData, bands
 
     def get_names(self):
         return self.bin_names
 
-def create_bands(frequencies, amplitudes, bands):
+    def create_bands(self, frequencies, amplitudes):
 
-    bandTotals = [0 for i in range(len(bands))]
-    bandCounts = [0 for i in range(len(bands))]
-        
-    for point in range(len(frequencies)):
-        for i, amplitude_limit in enumerate(bands):
-            if(frequencies[point] < amplitude_limit):
-                bandTotals[i] += amplitudes[point]
-                bandCounts[i] += 1
-                break
+        bandTotals = [0 for i in range(len(self.bands))]
+        bandCounts = [0 for i in range(len(self.bands))]
+            
+        for point in range(len(frequencies)):
+            for i, amplitude_limit in enumerate(self.bands):
+                if(frequencies[point] < amplitude_limit):
+                    bandTotals[i] += amplitudes[point]
+                    bandCounts[i] += 1
+                    break
 
-    bands = list(np.array(bandTotals)/np.array(bandCounts))
+        band_average = list(np.array(bandTotals)/np.array(bandCounts))
 
-    return bands
+        return band_average
 
 
 def plot_bands(bands, bin_names):
@@ -89,40 +92,33 @@ def plot_bands(bands, bin_names):
 if __name__ == "__main__":
 
     # Create Data reader with a queue length
-    dr = DataReader(200)
+    dr = DataReader(1000)
 
     # Give it a bit of time for the data to accumulate
-    time.sleep(10)
+    time.sleep(3)
 
     bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
     bin_range = [4, 8, 12, 30, 100]
 
     plt.ion()
-
-
     
-    frequencies, amplitudes = dr.get_data()
-    bands = create_bands(frequencies, amplitudes, bin_range)
+    # frequencies, amplitudes, bands = dr.get_data()
     # bar = ax.bar(bin_names, bands, color="#7967e1")
     
     plt.show(block = False)
     ax = plt.gca()
     plt.ylabel("Amplitude")
-    max_y = 0
-
-    frequencies, amplitudes = dr.get_data()
+    # max_y = 0
 
     while True:
 
-        frequencies, amplitudes = dr.get_data()
-
-        bands = create_bands(frequencies, amplitudes, bin_range)
+        frequencies, amplitudes, bands = dr.get_data()
 
         plt.cla()
         bar = plt.bar(bin_names, bands, color="#7967e1")
 
-        max_y = max(max_y, max(bands))
-        ax.set_ylim([0,max_y])
+        # max_y = max(max_y, max(bands))
+        # ax.set_ylim([0,max_y])
 
         print(f"Bands: {bands} + Total Length: {amplitudes.shape}")
         
