@@ -54,7 +54,7 @@ class DataReader:
             if bandsData is None:
                 bandsData = bands
             else:
-                bandsData = np.vstack((bandsData, bands))
+                bandsData = np.hstack((bandsData, bands))
                 # y, x = bandsData.shape
                 #bandsData = bandsData.reshape((x, y))
 
@@ -131,7 +131,7 @@ def plot_bands(bands, bin_names):
     plt.clf()
 
 
-if __name__ == "__main__":
+def main():
 
     # Create Data reader with a queue length
     dr = DataReader(500)
@@ -148,15 +148,24 @@ if __name__ == "__main__":
     ax = plt.gca()
     plt.ylabel("Amplitude")
 
+    ind = np.arange(5)
+    width = 0.35
+
+    frequencies, amplitudes, bands = dr.get_data()
+
     while True:
 
         frequencies, amplitudes, bands = dr.get_data()
 
         y, x = bands.shape
         bands = bands.reshape((x,y))
+        bin_names
 
         plt.cla()
-        bar = plt.bar(bin_names, bands[:, 0], color="#7967e1")
+        bar = plt.bar(ind, bands[:, 0], width, color="#7967e1")
+        bar = plt.bar(ind + width, bands[:, 1], width, color="green")
+
+        plt.xticks(ind + width / 2, bin_names)
 
         plt.pause(0.01)
         time.sleep(1)
@@ -167,3 +176,6 @@ if __name__ == "__main__":
     # print(array.shape)
     # # print(freq.size)
     # plt.show()
+
+if __name__ == "__main__":
+    main()
