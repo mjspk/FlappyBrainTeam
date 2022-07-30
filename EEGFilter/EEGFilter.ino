@@ -27,7 +27,8 @@
 
 #define SAMPLE_RATE 256
 #define BAUD_RATE 115200
-#define INPUT_PIN A0
+#define SENSOR_1_PIN A0
+#define SENSOR_2_PIN A1
 
 
 void setup() {
@@ -49,13 +50,15 @@ void loop() {
   // Sample
   if(timer < 0){
     timer += 1000000 / SAMPLE_RATE;
-    float sensor_value = analogRead(INPUT_PIN);
-    float signal = EEGFilter(sensor_value);
+    float signal1 = EEGFilter(analogRead(SENSOR_1_PIN));
+    float signal2 = EEGFilter(analogRead(SENSOR_2_PIN));
     
     Serial.print("<");
     Serial.print(SAMPLE_RATE);
     Serial.print(" ");
-    Serial.print(signal);
+    Serial.print(signal1);
+    Serial.print(" ");
+    Serial.print(signal2);
     Serial.println(">");
     
   }
