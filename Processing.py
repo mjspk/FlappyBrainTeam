@@ -100,7 +100,6 @@ class DataReader:
                     input_decoded = input_raw.decode()
 
             except:
-                print("exception")
                 input_raw = self.ser.readline()
                 input_decoded = input_raw.decode()
 
