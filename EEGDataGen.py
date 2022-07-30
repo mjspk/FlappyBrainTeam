@@ -48,17 +48,17 @@ def findEmptyFile(type):
         index = 0
         while found == False:
             fileName = type + str(index) + ".csv"
-            file = open(fileName, "r")
+            file = open("data/bin/" + fileName, "r")
             if file.read() == "":
                 found = True
             index = index + 1
     except IOError:
         found = True
-    return type + str(index) + ".csv"
+    return "data/bin/" + type + str(index) + ".csv"
 
 
-if __name__ == '__main__':
-# COMMANDS
+if __name__ == "__main__":
+    # COMMANDS
     times = 10
     final = "Signal1,Signal1,Word" + "\n"
     for i in range(0, times):

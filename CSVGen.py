@@ -1,4 +1,3 @@
-
 import random
 import time
 import EEGDataGen as dataGen
@@ -10,7 +9,7 @@ import regex as re
 class csvWriter:
 
     def __init__(self, channels, sources) -> None:
-        self.direction = ""
+        self.direction = "Right"
         self.frequencies = np.array([])
         self.amplitudes = np.array([])
         self.bands = np.array([])
@@ -37,7 +36,7 @@ class csvWriter:
     def inputLoop(self):
 
         endTime = time.time() + self.randomTime() 
-        self.direction = self.randomFlag()
+        self.direction = self.changeFlag()
                 #while true, enter the loop, have a time checker that breaks it, but while doing this if you end up 
                 #out of range you need to extend the loop
         while(time.time() < endTime):
@@ -62,7 +61,7 @@ class csvWriter:
         size = self.sources
         final = str(self.frequencies) + ","
         for i in range(size):
-            final += str(self.amplitudes[i,:])
+            final += str(self.amplitudes[i,:]) # type: ignore
             final += ","
         final += self.direction + "\n"
         file = open(self.fileNameRaw, "a")
@@ -79,17 +78,18 @@ class csvWriter:
     #         return False
 
     #here for test only
-    def randomFlag(self):
-        newFlag = random.randint(0, 1)
-        if(newFlag == 0):
+    def changeFlag(self):
+        if(self.direction == "Left"):
             return "Right"
         else: 
             return "Left"
 
     def randomTime(self):
-        return random.randint(5, 15)
+        return random.randint(2, 7)
+
 
 def main():
+
     channels = 5
     sources = 2
     writer = csvWriter(channels, sources)
@@ -98,9 +98,9 @@ def main():
     focusTime = 5 * 60
     finalTime = time.time() + focusTime
     fileHeader = ",".join(writer.dr.get_names()) + ", direction\n" 
-    fileNameBin = dataGen.findEmptyFile("bin")
-    fileNameRaw = dataGen.findEmptyFile("raw")
-    file = open(fileNameRaw, "w")
+    writer.fileNameBin = dataGen.findEmptyFile("bin")
+    writer.fileNameRaw = dataGen.findEmptyFile("raw")
+    file = open(writer.fileNameBin, "w")
     file.write(fileHeader)
     file.close()
     
@@ -109,18 +109,7 @@ def main():
         
             writer.inputLoop()
 
-                
-
-
-
-            
-
-
-
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Method call for main: This initializes and completes method calls using the UserInterface and EncryptionProcessor classes to
     # facilitate the execution of the encrytion application.
     main()

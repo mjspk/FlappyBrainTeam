@@ -1,3 +1,4 @@
+import re
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -8,18 +9,27 @@ from sklearn.preprocessing import StandardScaler, scale
 
 
 labels = ["left", "right"]
-# load data from csv file
-def load_data(filename):
-    if os.path.isfile(filename):
-        data = pd.read_csv(filename)
-        data.iloc[:, -1] = data.iloc[:, -1].map({"left": 0, "right": 1})
-        return data
-    else:
-        print("File not found")
-        return None
+# loop all csv files in the folder data/bin and create a dataframe
+def load_data():
+    data = None
+    for filename in os.listdir("data/bin"):
+        if filename.endswith(".csv"):
+            if data is None:
+                data = pd.read_csv("data/bin/" + filename)
+            else:
+                data = data.append(pd.read_csv("data/bin/" + filename))
+    data.iloc[:, -1] = data.iloc[:, -1].map({"Left": 0, "Right": 1})
+    # turn the rest to array of two numbers
+    return data
 
 
-# split data into train,aval and test
+# split data into train,aval and test and convert to tensor matrix
+def to_tensor(data):
+    tensors = []
+    for i in data.values:
+        tensors.append(np.array(i))
+
+
 def split_data(data):
     if data is not None:
         x_train = data.iloc[0 : int(len(data) * 0.8), :-1]
@@ -28,11 +38,6 @@ def split_data(data):
         y_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), -1]
         x_test = data.iloc[int(len(data) * 0.9) :, :-1]
         y_test = data.iloc[int(len(data) * 0.9) :, -1]
-        scaler = StandardScaler()
-        x_train = scaler.transform(x_train)
-        x_val = scaler.transform(x_val)
-        x_test = scaler.transform(x_test)
-
         return x_train, y_train, x_val, y_val, x_test, y_test
 
     else:
@@ -41,7 +46,7 @@ def split_data(data):
 
 
 def create_model():
-    inputs = keras.Input(shape=(9,), name="digits")
+    inputs = keras.Input(shape=(5,), name="digits")
     x = layers.Dense(64, activation="relu", name="dense_1")(inputs)
     # x = layers.Dense(128, activation="relu", name="dense_2")(x)
     # x = layers.Dense(256, activation="relu", name="dense_3")(x)
@@ -64,7 +69,7 @@ def train_model(model, x_train, y_train, x_val, y_val):
         and y_val is not None
     ):
         model.fit(
-            x_train,
+            np.array(x_train),
             y_train,
             epochs=100,
             validation_data=(x_val, y_val),
@@ -123,11 +128,12 @@ def load_model(filename="EEGmodel.h5"):
 
 
 if __name__ == "__main__":
-    data = load_data("BatchTestCSVData1.csv")
+    data = load_data()
     x_train, y_train, x_val, y_val, x_test, y_test = split_data(data)
     model = load_model()
     if model is None:
         model = create_model()
         model = train_model(model, x_train, y_train, x_val, y_val)
+        save_model(model)
     evaluate_model(model, x_val, y_val)
     predicte(model, x_test, y_test)
