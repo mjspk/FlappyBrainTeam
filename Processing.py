@@ -16,7 +16,27 @@ class DataReader:
         time.sleep(5)
         self.data = Queue(buffer_length)
         self.bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
-        self.bands = [1, 2, 4, 5, 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+        self.bands = [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+        ]
 
     def get_data(self, plot=False):
 
@@ -66,7 +86,6 @@ class DataReader:
 
         # Return results of the fourier transform
         return freq, fftData, bandsData
-
 
     def get_data2(self, plot=False):
 
@@ -161,7 +180,7 @@ class DataReader:
         return self.bin_names
 
     def get_bands(self):
-        return self.bands 
+        return self.bands
 
     def create_bands(self, frequencies, amplitudes):
 
@@ -183,17 +202,16 @@ class DataReader:
 
         bands, data_array = self.get_data2()
 
-        if (np.average(bands[1:4]) > 750):
+        if np.average(bands) > 750:
 
-            LR_data = data_array[:,1]
+            LR_data = data_array[:, 1]
 
             if np.argmin(LR_data) < np.argmax(LR_data):
-                return "right"
+                return "u", bands
             else:
-                return "left"
+                return "d", bands
 
-        return None
-
+        return "none", bands
 
 
 def plot_bands(bands, bin_names):
@@ -230,7 +248,6 @@ def main():
 
     max_y = 100
 
-
     while True:
 
         bands, data_array = dr.get_data2()
@@ -243,16 +260,11 @@ def main():
 
         if isInput:
             print(isInput)
-            plt.plot(data_array[:,1])
-            plt.show(block = False)
-        
+            plt.plot(data_array[:, 1])
+            plt.show(block=False)
 
         # max_y = max(max_y, max(bands[1:len(bands)]))
 
-
-            
-
-        
         # plt.cla()
         # plt.ylim([0,max_y])
         # plt.bar(b[1:], bands[1:len(bands)//2], color="#7967e1")

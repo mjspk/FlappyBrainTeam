@@ -91,31 +91,31 @@ class CSVDataReader:
         # return random.randint(2, 5)
         return 10
 
-    #New function
+    # New function
     def makeHeader(self):
-        fileHeader = "DeltaRight,ThetaRight,AlphaRight,BetaRight,GammaRight,DeltaLeft,ThetaLeft,AlphaLeft,BetaLeft,GammaLeft,Direction\n"
         self.fileNameBin = dataGen.findEmptyFile("bin")
         file = open(self.fileNameBin, "w")
-        file.write(fileHeader)
         file.close()
-    
-    #New function
+
+    # New function
     def writeFile(self, direction, bands):
-        size = 4
+        size = bands.shape[0]
         final = ""
         for i in range(size):
-            final += str(bands[i]) # type: ignore
+            final += str(round(bands[i]))  # type: ignore
             final += ","
         final += direction + "\n"
         file = open(self.fileNameBin, "a")
-        file.write(final)    
+        file.write(final)
 
     def main(self):
 
         dr = DataReader(500)
         focusTime = 0.25 * 60
         finalTime = time.time() + focusTime
-        fileHeader = "DeltaRight,ThetaRight,AlphaRight,BetaRight,GammaRight,DeltaLeft,ThetaLeft,AlphaLeft,BetaLeft,GammaLeft,Direction\n"
+        fileHeader = (
+            "d1,t1,a1,b1,g1,d2,t2,a2,b2,g2,d3,t3,a3,b3,g3,d4,t4,a4,b4,g4,Direction\n"
+        )
         fileNameBin = dataGen.findEmptyFile("bin")
         fileNameRaw = dataGen.findEmptyFile("raw")
         file = open(fileNameBin, "w")

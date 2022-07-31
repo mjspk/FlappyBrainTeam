@@ -2,6 +2,7 @@ import random
 import time
 import mouse as m
 import numpy as np
+from CSVGen import CSVDataReader
 from Controling import Controling
 from Processing import DataReader
 from Training import load_model
@@ -10,10 +11,10 @@ import msvcrt as keyboard
 
 
 class EEGDataGen:
-    def main(self):
+    def Model_test(self):
 
         model = load_model()
-        cn = Controling(960, 540)
+        cn = Controling()
         if model is not None:
             print("Model loaded")
         else:
@@ -37,17 +38,19 @@ class EEGDataGen:
             cn.move_mouse(predicted_direction, 0.5)
 
     def test(self):
-        cn = Controling(960, 540)
-
+        cn = Controling()
+        cs = CSVDataReader()
+        cs.makeHeader()
         dr = DataReader(75)
         while True:
-            direction = dr.left_right_input()
+            direction, bands = dr.left_right_input()
             if direction is not None:
                 cn.move_mouse(direction)
+                cs.writeFile(direction, bands)
                 print("Predicted: " + direction)
             else:
                 print("No direction")
-            time.sleep(1)
+            time.sleep(1.4)
 
 
 if __name__ == "__main__":
