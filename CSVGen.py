@@ -1,4 +1,4 @@
-from msilib.schema import Class
+
 import random
 import time
 import EEGDataGen as dataGen
@@ -36,10 +36,11 @@ class CSVDataReader:
             keyboard.getch()
             readIn[0], readIn[1], readIn[2] = dr.get_data()
             self.writeFileBin(direction, fileNameBin, readIn)
-            # self.writeFileRaw(direction, fileNameRaw, readIn)
+            self.writeFileRaw(direction, fileNameRaw, readIn)
 
     def writeFileBin(self, direction, fileName, readIn):
         size = 10
+
         final = ""
         for i in range(size):
             final += str(round(readIn[2][i]))
@@ -49,8 +50,12 @@ class CSVDataReader:
         file.write(final)
 
     def writeFileRaw(self, direction, fileName, readIn):
-        final = direction + ", "
-        final += np.vstack([readIn[0], readIn[1]]) + "\n"
+        size = 4
+        final = str(readIn[0]) + ","
+        for i in range(size):
+            final += str(readIn[1][i,:]) # type: ignore
+            final += ","
+        final += direction + "\n"
         file = open(fileName, "a")
         file.write(final)
 
@@ -69,6 +74,12 @@ class CSVDataReader:
         if self.globle_direction == "Right":
             self.globle_direction = "Left"
             return "Left"
+        elif self.globle_direction == "Left":
+            self.globle_direction = "Forward"
+            return "Forward"
+        elif self.globle_direction == "Forward":
+            self.globle_direction = "Backward"
+            return "Backward"
         else:
             self.globle_direction = "Right"
             return "Right"
@@ -78,10 +89,10 @@ class CSVDataReader:
 
     def main(self):
 
-        dr = DataReader(1000)
-        focusTime = 5 * 60
+        dr = DataReader(500)
+        focusTime = 0.25 * 60
         finalTime = time.time() + focusTime
-        fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, Direction\n"
+        fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, DeltaForward, ThetaForward, AlphaForward, BetaForward, GammaForward, DeltaBack, ThetaBack, AlphaBack, BetaBack, GammaBack, Direction\n"
         fileNameBin = dataGen.findEmptyFile("bin")
         fileNameRaw = dataGen.findEmptyFile("raw")
         file = open(fileNameBin, "w")
