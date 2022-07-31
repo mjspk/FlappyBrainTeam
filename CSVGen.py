@@ -1,23 +1,15 @@
+from msilib.schema import Class
 import random
 import time
 import EEGDataGen as dataGen
 import msvcrt as keyboard
 import numpy as np
 from Processing import DataReader
-import regex as re
 
-class csvWriter:
 
-    def __init__(self, channels, sources) -> None:
-        self.direction = "Right"
-        self.frequencies = np.array([])
-        self.amplitudes = np.array([])
-        self.bands = np.array([])
-        self.fileNameBin = ""
-        self.fileNameRaw = ""
-        self.dr = DataReader(1000)
-        self.channels = channels
-        self.sources = sources
+class CSVDataReader:
+    def __init__(self):
+        self.globle_direction = "Right"
 
     def intro(self):
         print("Get Ready to Focus ")
@@ -26,90 +18,84 @@ class csvWriter:
         while index > 0:
             t0 = time.time()
             print(index)
-            while(True):
+            while True:
                 t1 = time.time()
-                if(t1-t0) > 0.5:
+                if (t1 - t0) > 1:
                     break
             index -= 1
-            
 
-    def inputLoop(self):
+    def inputLoop(self, dr, fileNameBin, fileNameRaw):
 
-        endTime = time.time() + self.randomTime() 
-        self.direction = self.changeFlag()
-                #while true, enter the loop, have a time checker that breaks it, but while doing this if you end up 
-                #out of range you need to extend the loop
-        while(time.time() < endTime):
-            print("\nENTER " + self.direction + "\n")
+        endTime = time.time() + self.randomTime()
+        direction = self.randomFlag()
+        # while true, enter the loop, have a time checker that breaks it, but while doing this if you end up
+        # out of range you need to extend the loop
+        while time.time() < endTime:
+            readIn = [0, 0, 0]
+            print("\nENTER " + direction + "\n")
             keyboard.getch()
-            self.frequencies, self.amplitudes, self.bands = self.dr.get_data()
-            self.writeFileBin()
-            self.writeFileRaw()
+            readIn[0], readIn[1], readIn[2] = dr.get_data()
+            self.writeFileBin(direction, fileNameBin, readIn)
+            # self.writeFileRaw(direction, fileNameRaw, readIn)
 
-                
-    def writeFileBin(self):
-        size = self.channels * self.sources
+    def writeFileBin(self, direction, fileName, readIn):
+        size = 5
         final = ""
         for i in range(size):
-            final += str(self.bands[i]) # type: ignore
-            final += ", "
-        final += self.direction + "\n"
-        file = open(self.fileNameBin, "a")
-        file.write(final)    
-
-    def writeFileRaw(self):
-        size = self.sources
-        final = str(self.frequencies) + ","
-        for i in range(size):
-            final += str(self.amplitudes[i,:]) # type: ignore
+            final += str(round(readIn[2][i]))
             final += ","
-        final += self.direction + "\n"
-        file = open(self.fileNameRaw, "a")
-        file.write(final)           
-        
-    # def withinRange(readIn):
-    #     threshold1 = 13
-    #     threshold2 = 29
-    #     input1Valid = readIn[0] > threshold1 and readIn[0] < threshold2
-    #     input2Valid = readIn[1] > threshold1 and readIn[1] < threshold2
-    #     if(input1Valid and input2Valid):
-    #         return True
-    #     else: 
-    #         return False
+        final += direction + "\n"
+        file = open(fileName, "a")
+        file.write(final)
 
-    #here for test only
-    def changeFlag(self):
-        if(self.direction == "Left"):
-            return "Right"
-        else: 
+    def writeFileRaw(self, direction, fileName, readIn):
+        final = direction + ", "
+        final += np.vstack([readIn[0], readIn[1]]) + "\n"
+        file = open(fileName, "a")
+        file.write(final)
+
+    def withinRange(self, readIn):
+        threshold1 = 13
+        threshold2 = 29
+        input1Valid = readIn[0] > threshold1 and readIn[0] < threshold2
+        input2Valid = readIn[1] > threshold1 and readIn[1] < threshold2
+        if input1Valid and input2Valid:
+            return True
+        else:
+            return False
+
+    # here for test only
+    def randomFlag(self):
+        if self.globle_direction == "Right":
+            self.globle_direction = "Left"
             return "Left"
+        else:
+            self.globle_direction = "Right"
+            return "Right"
 
     def randomTime(self):
-        return random.randint(2, 7)
+        return random.randint(2, 5)
 
+    def main(self):
 
-def main():
+        dr = DataReader(1000)
+        focusTime = 5 * 60
+        finalTime = time.time() + focusTime
+        fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, Direction\n"
+        fileNameBin = dataGen.findEmptyFile("bin")
+        fileNameRaw = dataGen.findEmptyFile("raw")
+        file = open(fileNameBin, "w")
+        file.write(fileHeader)
+        file.close()
+        self.intro()
 
-    channels = 5
-    sources = 2
-    writer = csvWriter(channels, sources)
-    writer.intro()
-    # dr = DataReader(1000)
-    focusTime = 5 * 60
-    finalTime = time.time() + focusTime
-    fileHeader = ",".join(writer.dr.get_names()) + ", direction\n" 
-    writer.fileNameBin = dataGen.findEmptyFile("bin")
-    writer.fileNameRaw = dataGen.findEmptyFile("raw")
-    file = open(writer.fileNameBin, "w")
-    file.write(fileHeader)
-    file.close()
-    
+        while time.time() < finalTime:
 
-    while(time.time() < finalTime):
-        
-            writer.inputLoop()
+            self.inputLoop(dr, fileNameBin, fileNameRaw)
+
 
 if __name__ == "__main__":
     # Method call for main: This initializes and completes method calls using the UserInterface and EncryptionProcessor classes to
     # facilitate the execution of the encrytion application.
-    main()
+    dr = CSVDataReader()
+    dr.main()
