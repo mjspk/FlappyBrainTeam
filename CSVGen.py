@@ -6,6 +6,9 @@ import numpy as np
 from Processing import DataReader
 
 
+globle_direction = "Right"
+
+
 def intro():
     print("Get Ready to Focus ")
     print("Please hit the key 'R' when asked to Enter Right and 'L' for Left")
@@ -32,15 +35,15 @@ def inputLoop(dr, fileNameBin, fileNameRaw):
         keyboard.getch()
         readIn[0], readIn[1], readIn[2] = dr.get_data()
         writeFileBin(direction, fileNameBin, readIn)
-    # writeFileRaw(direction, fileNameRaw, readIn)
+        writeFileRaw(direction, fileNameRaw, readIn)
 
 
 def writeFileBin(direction, fileName, readIn):
-    size = 10
+    size = 5
     final = ""
     for i in range(size):
-        final += str(round(readIn[2][i]))
-        final += ","
+        final += str(readIn[2][i])
+        final += ", "
     final += direction + "\n"
     file = open(fileName, "a")
     file.write(final)
@@ -66,15 +69,16 @@ def withinRange(readIn):
 
 # here for test only
 def randomFlag():
-    newFlag = random.randint(0, 1)
-    if newFlag == 0:
-        return "Right"
-    else:
+    if globle_direction == "Right":
+        globle_direction = "Left"
         return "Left"
+    else:
+        globle_direction = "Right"
+        return "Right"
 
 
 def randomTime():
-    return random.randint(5, 15)
+    return random.randint(2, 5)
 
 
 def main():
@@ -82,7 +86,6 @@ def main():
     dr = DataReader(1000)
     focusTime = 5 * 60
     finalTime = time.time() + focusTime
-
     fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, Direction\n"
     fileNameBin = dataGen.findEmptyFile("bin")
     fileNameRaw = dataGen.findEmptyFile("raw")
