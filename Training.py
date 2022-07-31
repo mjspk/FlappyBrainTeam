@@ -1,4 +1,3 @@
-import re
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -19,17 +18,10 @@ def load_data():
             else:
                 data = data.append(pd.read_csv("data/bin/" + filename))
     data.iloc[:, -1] = data.iloc[:, -1].map({"Left": 0, "Right": 1})
-    # turn the rest to array of two numbers
     return data
 
 
-# split data into train,aval and test and convert to tensor matrix
-def to_tensor(data):
-    tensors = []
-    for i in data.values:
-        tensors.append(np.array(i))
-
-
+# split data into train,aval and test
 def split_data(data):
     if data is not None:
         x_train = data.iloc[0 : int(len(data) * 0.8), :-1]
@@ -38,6 +30,10 @@ def split_data(data):
         y_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), -1]
         x_test = data.iloc[int(len(data) * 0.9) :, :-1]
         y_test = data.iloc[int(len(data) * 0.9) :, -1]
+
+        print(y_train)
+        print(y_val)
+
         return x_train, y_train, x_val, y_val, x_test, y_test
 
     else:
@@ -46,10 +42,10 @@ def split_data(data):
 
 
 def create_model():
-    inputs = keras.Input(shape=(5,), name="digits")
+    inputs = keras.Input(shape=(10,), name="digits")
     x = layers.Dense(64, activation="relu", name="dense_1")(inputs)
-    # x = layers.Dense(128, activation="relu", name="dense_2")(x)
-    # x = layers.Dense(256, activation="relu", name="dense_3")(x)
+    x = layers.Dense(128, activation="relu", name="dense_2")(x)
+    x = layers.Dense(256, activation="relu", name="dense_3")(x)
     outputs = layers.Dense(3, activation="softmax", name="predictions")(x)
     model = keras.Model(inputs=inputs, outputs=outputs)
     model.compile(
@@ -69,9 +65,9 @@ def train_model(model, x_train, y_train, x_val, y_val):
         and y_val is not None
     ):
         model.fit(
-            np.array(x_train),
+            x_train,
             y_train,
-            epochs=100,
+            epochs=10,
             validation_data=(x_val, y_val),
             batch_size=64,
             verbose=2,

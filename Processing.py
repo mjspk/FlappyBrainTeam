@@ -26,10 +26,10 @@ class DataReader:
 
             time.sleep(0.1)
             self.read_serial()
-        
+
         data_array = np.array(self.data.queue)
         freq = np.fft.fftfreq(data_array.shape[0]) * np.average(data_array[0, 0])
-            
+
         freq = freq[0 : len(freq) // 2]
 
         fftData = None
@@ -56,7 +56,7 @@ class DataReader:
             else:
                 bandsData = np.hstack((bandsData, bands))
                 # y, x = bandsData.shape
-                #bandsData = bandsData.reshape((x, y))
+                # bandsData = bandsData.reshape((x, y))
 
         if plot:
             plt.stem(freq, fftReading, markerfmt=" ")
@@ -84,7 +84,9 @@ class DataReader:
                     continue
 
                 if len(input_raw) > 5:
-                    input_string = input_decoded.strip().replace("<", "").replace(">", "")
+                    input_string = (
+                        input_decoded.strip().replace("<", "").replace(">", "")
+                    )
                     input_s_array = input_string.split()
                     input_list = list(map(float, input_s_array))
                     input_array = np.array(input_list)
@@ -102,7 +104,6 @@ class DataReader:
             except:
                 input_raw = self.ser.readline()
                 input_decoded = input_raw.decode()
-
 
     def get_names(self):
         return self.bin_names
@@ -158,7 +159,7 @@ def main():
         frequencies, amplitudes, bands = dr.get_data()
 
         y, x = bands.shape
-        bands = bands.reshape((x,y))
+        bands = bands.reshape((x, y))
         bin_names
 
         plt.cla()
@@ -176,6 +177,7 @@ def main():
     # print(array.shape)
     # # print(freq.size)
     # plt.show()
+
 
 if __name__ == "__main__":
     main()

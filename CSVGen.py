@@ -32,15 +32,15 @@ def inputLoop(dr, fileNameBin, fileNameRaw):
         keyboard.getch()
         readIn[0], readIn[1], readIn[2] = dr.get_data()
         writeFileBin(direction, fileNameBin, readIn)
-        writeFileRaw(direction, fileNameRaw, readIn)
+    # writeFileRaw(direction, fileNameRaw, readIn)
 
 
 def writeFileBin(direction, fileName, readIn):
-    size = 5
+    size = 10
     final = ""
     for i in range(size):
-        final += str(readIn[2][i])
-        final += ", "
+        final += str(round(readIn[2][i]))
+        final += ","
     final += direction + "\n"
     file = open(fileName, "a")
     file.write(final)
@@ -82,7 +82,8 @@ def main():
     dr = DataReader(1000)
     focusTime = 5 * 60
     finalTime = time.time() + focusTime
-    fileHeader = ",".join(dr.get_names()) + ", direction\n"
+
+    fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, Direction\n"
     fileNameBin = dataGen.findEmptyFile("bin")
     fileNameRaw = dataGen.findEmptyFile("raw")
     file = open(fileNameBin, "w")
