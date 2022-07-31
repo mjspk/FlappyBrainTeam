@@ -39,7 +39,7 @@ class CSVDataReader:
             # self.writeFileRaw(direction, fileNameRaw, readIn)
 
     def writeFileBin(self, direction, fileName, readIn):
-        size = 5
+        size = 10
         final = ""
         for i in range(size):
             final += str(round(readIn[2][i]))

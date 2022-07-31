@@ -30,10 +30,6 @@ def split_data(data):
         y_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), -1]
         x_test = data.iloc[int(len(data) * 0.9) :, :-1]
         y_test = data.iloc[int(len(data) * 0.9) :, -1]
-
-        print(y_train)
-        print(y_val)
-
         return x_train, y_train, x_val, y_val, x_test, y_test
 
     else:
@@ -44,9 +40,7 @@ def split_data(data):
 def create_model():
     inputs = keras.Input(shape=(10,), name="digits")
     x = layers.Dense(64, activation="relu", name="dense_1")(inputs)
-    x = layers.Dense(128, activation="relu", name="dense_2")(x)
-    x = layers.Dense(256, activation="relu", name="dense_3")(x)
-    outputs = layers.Dense(3, activation="softmax", name="predictions")(x)
+    outputs = layers.Dense(2, activation="softmax", name="predictions")(x)
     model = keras.Model(inputs=inputs, outputs=outputs)
     model.compile(
         optimizer=keras.optimizers.Adam(lr=0.001),
@@ -67,7 +61,7 @@ def train_model(model, x_train, y_train, x_val, y_val):
         model.fit(
             x_train,
             y_train,
-            epochs=10,
+            epochs=500,
             validation_data=(x_val, y_val),
             batch_size=64,
             verbose=2,
