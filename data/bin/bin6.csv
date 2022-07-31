@@ -1,4 +1,4 @@
-DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, Direction
+DeltaRight,ThetaRight,AlphaRight,BetaRight,GammaRight,DeltaLeft,ThetaLeft,AlphaLeft,BetaLeft,GammaLeft,Direction
 157,113,121,56,29,158,113,120,57,30,Forward
 111,108,96,50,30,113,109,95,51,29,Forward
 115,103,96,50,29,113,103,98,50,28,Backward
