@@ -1,4 +1,3 @@
-
 import random
 import time
 import EEGDataGen as dataGen
@@ -10,6 +9,7 @@ from Processing import DataReader
 class CSVDataReader:
     def __init__(self):
         self.globle_direction = "Right"
+        self.fileName = ""
 
     def intro(self):
         print("Get Ready to Focus ")
@@ -53,7 +53,7 @@ class CSVDataReader:
         size = 4
         final = str(readIn[0]) + ","
         for i in range(size):
-            final += str(readIn[1][i,:]) # type: ignore
+            final += str(readIn[1][i, :])  # type: ignore
             final += ","
         final += direction + "\n"
         file = open(fileName, "a")
@@ -91,12 +91,31 @@ class CSVDataReader:
         # return random.randint(2, 5)
         return 10
 
+    # New function
+    def makeHeader(self):
+        self.fileNameBin = dataGen.findEmptyFile("bin")
+        file = open(self.fileNameBin, "w")
+        file.close()
+
+    # New function
+    def writeFile(self, direction, bands):
+        size = bands.shape[0]
+        final = ""
+        for i in range(size):
+            final += str(round(bands[i]))  # type: ignore
+            final += ","
+        final += direction + "\n"
+        file = open(self.fileNameBin, "a")
+        file.write(final)
+
     def main(self):
 
         dr = DataReader(500)
         focusTime = 0.25 * 60
         finalTime = time.time() + focusTime
-        fileHeader = "DeltaRight,ThetaRight,AlphaRight,BetaRight,GammaRight,DeltaLeft,ThetaLeft,AlphaLeft,BetaLeft,GammaLeft,Direction\n"
+        fileHeader = (
+            "d1,t1,a1,b1,g1,d2,t2,a2,b2,g2,d3,t3,a3,b3,g3,d4,t4,a4,b4,g4,Direction\n"
+        )
         fileNameBin = dataGen.findEmptyFile("bin")
         fileNameRaw = dataGen.findEmptyFile("raw")
         file = open(fileNameBin, "w")

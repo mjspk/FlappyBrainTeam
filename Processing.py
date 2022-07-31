@@ -16,7 +16,27 @@ class DataReader:
         time.sleep(5)
         self.data = Queue(buffer_length)
         self.bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
-        self.bands = [1, 2, 4, 5, 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+        self.bands = [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+        ]
 
     def get_data(self, plot=False):
 
@@ -66,7 +86,6 @@ class DataReader:
 
         # Return results of the fourier transform
         return freq, fftData, bandsData
-
 
     def get_data2(self, plot=False):
 
@@ -161,7 +180,7 @@ class DataReader:
         return self.bin_names
 
     def get_bands(self):
-        return self.bands 
+        return self.bands
 
     def create_bands(self, frequencies, amplitudes):
 
@@ -193,7 +212,7 @@ class DataReader:
         # print(f"Side: {side_data}, Vertical: {vert_data}")
 
         if max(side_data, vert_data) < 200:
-            return None
+            return None, bands
 
 
         if side_data > vert_data:
@@ -201,18 +220,18 @@ class DataReader:
             LR_data = data_array[:,1]
 
             if np.argmin(LR_data) < np.argmax(LR_data):
-                return "right"
+                return "r", bands
             else:
-                return "left"
+                return "l", bands
 
         else:
             # look for a vertical input
             UD_data = data_array[:,2]
 
             if np.argmin(UD_data) < np.argmax(UD_data):
-                return "up"
+                return "u", bands
             else:
-                return "down"
+                return "d", bands
 
 
 def plot_bands(bands, bin_names):
@@ -248,7 +267,6 @@ def main():
     b = dr.get_bands()
 
     max_y = 100
-
 
     while True:
 
