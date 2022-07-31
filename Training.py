@@ -5,9 +5,10 @@ import os
 from tensorflow import keras
 from keras import layers
 from sklearn.preprocessing import StandardScaler, scale
+from tensorflow import feature_column
 
 
-labels = ["left", "right"]
+labels = ["left", "right", "backward", "forward"]
 # loop all csv files in the folder data/bin and create a dataframe
 def load_data():
     data = None
@@ -17,65 +18,72 @@ def load_data():
                 data = pd.read_csv("data/bin/" + filename)
             else:
                 data = data.append(pd.read_csv("data/bin/" + filename))
-    data.iloc[:, -1] = data.iloc[:, -1].map({"Left": 0, "Right": 1})
+    data.iloc[:, -1] = data.iloc[:, -1].map(
+        {"Left": 0, "Right": 1, "Backward": 2, "Forward": 3}
+    )
+
+    data = data.drop(columns=["GammaRight", "GammaLeft"])
     return data
 
 
-# split data into train,aval and test
+def df_to_dataset(dataframe, shuffle=True, batch_size=32):
+    dataframe = dataframe.copy()
+    labels = dataframe.pop("Direction")
+    ds = tf.data.Dataset.from_tensor_slices((dict(dataframe), labels))
+    if shuffle:
+        ds = ds.shuffle(buffer_size=len(dataframe))
+    ds = ds.batch(batch_size)
+    return ds
+
+
+# split data into train,aval and test df
 def split_data(data):
     if data is not None:
-        x_train = data.iloc[0 : int(len(data) * 0.8), :-1]
-        y_train = data.iloc[0 : int(len(data) * 0.8), -1]
-        x_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), :-1]
-        y_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), -1]
-        x_test = data.iloc[int(len(data) * 0.9) :, :-1]
-        y_test = data.iloc[int(len(data) * 0.9) :, -1]
-        return x_train, y_train, x_val, y_val, x_test, y_test
+        train_df = data.sample(frac=0.8, random_state=0)
+        val_df = data.drop(train_df.index)
+        test_df = val_df.sample(frac=0.5, random_state=0)
+        val_df = val_df.drop(test_df.index)
+        return train_df, val_df, test_df
 
     else:
         print("Data not found")
         return None
 
 
-def create_model():
-    inputs = keras.Input(shape=(10,), name="digits")
-    x = layers.Dense(64, activation="relu", name="dense_1")(inputs)
-    outputs = layers.Dense(2, activation="softmax", name="predictions")(x)
-    model = keras.Model(inputs=inputs, outputs=outputs)
-    model.compile(
-        optimizer=keras.optimizers.Adam(lr=0.001),
-        loss=keras.losses.SparseCategoricalCrossentropy(),
-        metrics=[keras.metrics.SparseCategoricalAccuracy()],
+def create_model(feature_columns):
+    feature_layer = tf.keras.layers.DenseFeatures(feature_columns)
+    model = tf.keras.Sequential(
+        [
+            feature_layer,
+            layers.Dense(128, activation="relu"),
+            layers.Dense(128, activation="relu"),
+            layers.Dropout(0.1),
+            layers.Dense(1),
+        ]
     )
+
+    model.compile(
+        optimizer="adam",
+        loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        metrics=["accuracy"],
+    )
+
     return model
 
 
-def train_model(model, x_train, y_train, x_val, y_val):
-    if (
-        model is not None
-        and x_train is not None
-        and y_train is not None
-        and x_val is not None
-        and y_val is not None
-    ):
-        model.fit(
-            x_train,
-            y_train,
-            epochs=500,
-            validation_data=(x_val, y_val),
-            batch_size=64,
-            verbose=2,
-        )
+def train_model(model, train_ds, val_ds):
+    if model is not None and train_ds is not None and val_ds is not None:
+        model.fit(train_ds, validation_data=val_ds, epochs=10)
         return model
     else:
         print("Model or data not found")
         return None
 
 
-def evaluate_model(model, x_val, y_val):
+def evaluate_model(model, val_ds):
 
-    if model is not None and x_val is not None and y_val is not None:
-        loss, acc = model.evaluate(x_val, y_val, verbose=2, batch_size=64)
+    if model is not None and val_ds is not None:
+        loss, acc = model.evaluate(val_ds)
         print("Accuracy: %f" % acc)
         print("Loss: %f" % loss)
 
@@ -119,11 +127,24 @@ def load_model(filename="EEGmodel.h5"):
 
 if __name__ == "__main__":
     data = load_data()
-    x_train, y_train, x_val, y_val, x_test, y_test = split_data(data)
+    train_df, val_df, test_df = split_data(data)
+    train_ds = df_to_dataset(train_df)
+    val_ds = df_to_dataset(val_df, shuffle=False)
+    test_ds = df_to_dataset(test_df, shuffle=False)
+    for feature_batch, label_batch in train_ds.take(1):
+        print("Every feature:", list(feature_batch.keys()))
+        print("A batch of targets:", label_batch)
+    feature_columns = []
+    indicator_column_names = "DeltaRight,ThetaRight,AlphaRight,BetaRight,DeltaLeft,ThetaLeft,AlphaLeft,BetaLeft"
+    for col_name in indicator_column_names.split(","):
+        categorical_column = feature_column.categorical_column_with_vocabulary_list(
+            col_name, data[col_name].unique()
+        )
+        indicator_column = feature_column.indicator_column(categorical_column)
+        feature_columns.append(indicator_column)
     model = load_model()
     if model is None:
-        model = create_model()
-        model = train_model(model, x_train, y_train, x_val, y_val)
-        save_model(model)
-    evaluate_model(model, x_val, y_val)
-    predicte(model, x_test, y_test)
+        model = create_model(feature_columns)
+        model = train_model(model, train_ds, val_ds)
+        evaluate_model(model, test_ds)
+        # save_model(model)
