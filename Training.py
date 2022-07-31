@@ -7,7 +7,7 @@ from keras import layers
 from sklearn.preprocessing import StandardScaler, scale
 
 
-labels = ["left", "right"]
+labels = ["left", "right", "Up", "Down", "Click"]
 # loop all csv files in the folder data/bin and create a dataframe
 def load_data():
     data = None
@@ -17,7 +17,10 @@ def load_data():
                 data = pd.read_csv("data/bin/" + filename)
             else:
                 data = data.append(pd.read_csv("data/bin/" + filename))
-    data.iloc[:, -1] = data.iloc[:, -1].map({"Left": 0, "Right": 1})
+
+    data.iloc[:, -1] = data.iloc[:, -1].map(
+        {"Left": 0, "Right": 1, "Up": 2, "Down": 3, "Click": 4}
+    )
     return data
 
 
@@ -30,10 +33,6 @@ def split_data(data):
         y_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), -1]
         x_test = data.iloc[int(len(data) * 0.9) :, :-1]
         y_test = data.iloc[int(len(data) * 0.9) :, -1]
-
-        print(y_train)
-        print(y_val)
-
         return x_train, y_train, x_val, y_val, x_test, y_test
 
     else:
@@ -44,14 +43,12 @@ def split_data(data):
 def create_model():
     inputs = keras.Input(shape=(10,), name="digits")
     x = layers.Dense(64, activation="relu", name="dense_1")(inputs)
-    x = layers.Dense(128, activation="relu", name="dense_2")(x)
-    x = layers.Dense(256, activation="relu", name="dense_3")(x)
-    outputs = layers.Dense(3, activation="softmax", name="predictions")(x)
+    outputs = layers.Dense(1, activation="sigmoid", name="predictions")(x)
     model = keras.Model(inputs=inputs, outputs=outputs)
     model.compile(
-        optimizer=keras.optimizers.Adam(lr=0.001),
-        loss=keras.losses.SparseCategoricalCrossentropy(),
-        metrics=[keras.metrics.SparseCategoricalAccuracy()],
+        optimizer=keras.optimizers.Adam(),
+        loss=keras.losses.BinaryCrossentropy(from_logits=True),
+        metrics=["accuracy"],
     )
     return model
 
@@ -67,7 +64,7 @@ def train_model(model, x_train, y_train, x_val, y_val):
         model.fit(
             x_train,
             y_train,
-            epochs=10,
+            epochs=500,
             validation_data=(x_val, y_val),
             batch_size=64,
             verbose=2,
@@ -126,10 +123,11 @@ def load_model(filename="EEGmodel.h5"):
 if __name__ == "__main__":
     data = load_data()
     x_train, y_train, x_val, y_val, x_test, y_test = split_data(data)
+
     model = load_model()
     if model is None:
         model = create_model()
         model = train_model(model, x_train, y_train, x_val, y_val)
-        save_model(model)
+        # save_model(model)
     evaluate_model(model, x_val, y_val)
     predicte(model, x_test, y_test)

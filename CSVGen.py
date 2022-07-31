@@ -39,7 +39,8 @@ class CSVDataReader:
             self.writeFileRaw(direction, fileNameRaw, readIn)
 
     def writeFileBin(self, direction, fileName, readIn):
-        size = 20
+        size = 10
+
         final = ""
         for i in range(size):
             final += str(round(readIn[2][i]))
@@ -74,24 +75,28 @@ class CSVDataReader:
             self.globle_direction = "Left"
             return "Left"
         elif self.globle_direction == "Left":
-            self.globle_direction = "Forward"
-            return "Forward"
-        elif self.globle_direction == "Forward":
-            self.globle_direction = "Backward"
-            return "Backward"
+            self.globle_direction = "Up"
+            return "Up"
+        elif self.globle_direction == "Up":
+            self.globle_direction = "Down"
+            return "Down"
+        elif self.globle_direction == "Down":
+            self.globle_direction = "Blink"
+            return "Blink"
         else:
             self.globle_direction = "Right"
             return "Right"
 
     def randomTime(self):
-        return random.randint(2, 5)
+        # return random.randint(2, 5)
+        return 10
 
     def main(self):
 
         dr = DataReader(500)
         focusTime = 0.25 * 60
         finalTime = time.time() + focusTime
-        fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, DeltaForward, ThetaForward, AlphaForward, BetaForward, GammaForward, DeltaBack, ThetaBack, AlphaBack, BetaBack, GammaBack, Direction\n"
+        fileHeader = "DeltaRight,ThetaRight,AlphaRight,BetaRight,GammaRight,DeltaLeft,ThetaLeft,AlphaLeft,BetaLeft,GammaLeft,Direction\n"
         fileNameBin = dataGen.findEmptyFile("bin")
         fileNameRaw = dataGen.findEmptyFile("raw")
         file = open(fileNameBin, "w")
