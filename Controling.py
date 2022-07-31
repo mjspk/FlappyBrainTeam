@@ -126,31 +126,50 @@ class Controling:
                     pyautogui.moveTo(self.x, self.y)
 
             elif direction == "ru":
-                if self.x < self.width:
+                if self.x < self.width and self.y > 0:
+                    self.x += 10
+                    self.y -= 10
+                    pyautogui.moveTo(self.x, self.y)
+                elif self.x < self.width:
                     self.x += 10
                     pyautogui.moveTo(self.x, self.y)
-                if self.y > 0:
+                elif self.y > 0:
                     self.y -= 10
                     pyautogui.moveTo(self.x, self.y)
-            elif direction == "lu":
-                if self.x > 0:
-                    self.x -= 10
-                    pyautogui.moveTo(self.x, self.y)
-                if self.y > 0:
-                    self.y -= 10
-                    pyautogui.moveTo(self.x, self.y)
+
             elif direction == "rd":
-                if self.x < self.width:
+                if self.x < self.width and self.y < self.height:
                     self.x += 10
-                    pyautogui.moveTo(self.x, self.y)
-                if self.y < self.height:
                     self.y += 10
                     pyautogui.moveTo(self.x, self.y)
-            elif direction == "ld":
-                if self.x > 0:
+                elif self.x < self.width:
+                    self.x += 10
+                    pyautogui.moveTo(self.x, self.y)
+                elif self.y < self.height:
+                    self.y += 10
+                    pyautogui.moveTo(self.x, self.y)
+
+            elif direction == "lu":
+                if self.x > 0 and self.y > 0:
+                    self.x -= 10
+                    self.y -= 10
+                    pyautogui.moveTo(self.x, self.y)
+                elif self.x > 0:
                     self.x -= 10
                     pyautogui.moveTo(self.x, self.y)
-                if self.y < self.height:
+                elif self.y > 0:
+                    self.y -= 10
+                    pyautogui.moveTo(self.x, self.y)
+
+            elif direction == "ld":
+                if self.x > 0 and self.y < self.height:
+                    self.x -= 10
+                    self.y += 10
+                    pyautogui.moveTo(self.x, self.y)
+                elif self.x > 0:
+                    self.x -= 10
+                    pyautogui.moveTo(self.x, self.y)
+                elif self.y < self.height:
                     self.y += 10
                     pyautogui.moveTo(self.x, self.y)
 
@@ -172,32 +191,52 @@ class Controling:
                     if self.y < self.height:
                         self.y += 10
                         pyautogui.moveTo(self.x, self.y)
+
                 elif direction == "ru":
-                    if self.x < self.width:
+                    if self.x < self.width and self.y > 0:
+                        self.x += 10
+                        self.y -= 10
+                        pyautogui.moveTo(self.x, self.y)
+                    elif self.x < self.width:
                         self.x += 10
                         pyautogui.moveTo(self.x, self.y)
-                    if self.y > 0:
+                    elif self.y > 0:
                         self.y -= 10
                         pyautogui.moveTo(self.x, self.y)
-                elif direction == "lu":
-                    if self.x > 0:
-                        self.x -= 10
-                        pyautogui.moveTo(self.x, self.y)
-                    if self.y > 0:
-                        self.y -= 10
-                        pyautogui.moveTo(self.x, self.y)
+
                 elif direction == "rd":
-                    if self.x < self.width:
+                    if self.x < self.width and self.y < self.height:
                         self.x += 10
-                        pyautogui.moveTo(self.x, self.y)
-                    if self.y < self.height:
                         self.y += 10
                         pyautogui.moveTo(self.x, self.y)
-                elif direction == "ld":
-                    if self.x > 0:
+                    elif self.x < self.width:
+                        self.x += 10
+                        pyautogui.moveTo(self.x, self.y)
+                    elif self.y < self.height:
+                        self.y += 10
+                        pyautogui.moveTo(self.x, self.y)
+
+                elif direction == "lu":
+                    if self.x > 0 and self.y > 0:
+                        self.x -= 10
+                        self.y -= 10
+                        pyautogui.moveTo(self.x, self.y)
+                    elif self.x > 0:
                         self.x -= 10
                         pyautogui.moveTo(self.x, self.y)
-                    if self.y < self.height:
+                    elif self.y > 0:
+                        self.y -= 10
+                        pyautogui.moveTo(self.x, self.y)
+
+                elif direction == "ld":
+                    if self.x > 0 and self.y < self.height:
+                        self.x -= 10
+                        self.y += 10
+                        pyautogui.moveTo(self.x, self.y)
+                    elif self.x > 0:
+                        self.x -= 10
+                        pyautogui.moveTo(self.x, self.y)
+                    elif self.y < self.height:
                         self.y += 10
                         pyautogui.moveTo(self.x, self.y)
 
