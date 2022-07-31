@@ -39,7 +39,7 @@ class CSVDataReader:
             # self.writeFileRaw(direction, fileNameRaw, readIn)
 
     def writeFileBin(self, direction, fileName, readIn):
-        size = 5
+        size = 20
         final = ""
         for i in range(size):
             final += str(round(readIn[2][i]))
@@ -78,10 +78,10 @@ class CSVDataReader:
 
     def main(self):
 
-        dr = DataReader(1000)
-        focusTime = 5 * 60
+        dr = DataReader(500)
+        focusTime = 0.25 * 60
         finalTime = time.time() + focusTime
-        fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, Direction\n"
+        fileHeader = "DeltaRight, ThetaRight, AlphaRight, BetaRight, GammaRight, DeltaLeft, ThetaLeft, AlphaLeft, BetaLeft, GammaLeft, DeltaForward, ThetaForward, AlphaForward, BetaForward, GammaForward, DeltaBack, ThetaBack, AlphaBack, BetaBack, GammaBack, Direction\n"
         fileNameBin = dataGen.findEmptyFile("bin")
         fileNameRaw = dataGen.findEmptyFile("raw")
         file = open(fileNameBin, "w")

@@ -8,7 +8,7 @@ from queue import Queue
 class DataReader:
     def __init__(self, buffer_length):
 
-        self.ser = serial.Serial("COM4", 115200, timeout=0.00001)
+        self.ser = serial.Serial("COM4", 115200, timeout=0.001)
         self.ser.flushInput()
         self.ser.flushOutput()
 
@@ -21,9 +21,8 @@ class DataReader:
 
         self.read_serial()
 
-        # Convert the data left in teh queue to a numpy array
+        # Convert the data left in the queue to a numpy array
         while not self.data.full():
-
             time.sleep(0.1)
             self.read_serial()
 
@@ -91,7 +90,7 @@ class DataReader:
                     input_list = list(map(float, input_s_array))
                     input_array = np.array(input_list)
 
-                    if len(input_array) == 3:
+                    if len(input_array) == 5:
 
                         if self.data.full():
                             self.data.get()
