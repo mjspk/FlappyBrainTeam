@@ -1,7 +1,6 @@
 import random
 
 import numpy as np
-from scipy import rand
 from Processing import DataReader
 from Training import load_model
 from Training import labels
