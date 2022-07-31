@@ -8,7 +8,7 @@ from queue import Queue
 class DataReader:
     def __init__(self, buffer_length):
 
-        self.ser = serial.Serial("COM7", 115200, timeout=0.00001)
+        self.ser = serial.Serial("COM4", 115200, timeout=0.00001)
 
         self.ser.flushInput()
         self.ser.flushOutput()
@@ -202,16 +202,36 @@ class DataReader:
 
         bands, data_array = self.get_data2()
 
-        if np.average(bands) > 750:
+        # side_data = np.average(bands[1:4])
+        # vert_data = np.average(bands[len(bands)//2+1:len(bands)//2+4])
+        
+        l = len(bands)
+        side_data = np.average(bands[1:l//2])
+        vert_data = np.average(bands[l//2+2:])
 
-            LR_data = data_array[:, 1]
+        # print(f"Side: {side_data}, Vertical: {vert_data}")
+
+        if max(side_data, vert_data) < 200:
+            return None, bands
+
+
+        if side_data > vert_data:
+            # look for a side to side input
+            LR_data = data_array[:,1]
 
             if np.argmin(LR_data) < np.argmax(LR_data):
+                return "r", bands
+            else:
+                return "l", bands
+
+        else:
+            # look for a vertical input
+            UD_data = data_array[:,2]
+
+            if np.argmin(UD_data) < np.argmax(UD_data):
                 return "u", bands
             else:
                 return "d", bands
-
-        return "none", bands
 
 
 def plot_bands(bands, bin_names):
@@ -260,28 +280,12 @@ def main():
 
         if isInput:
             print(isInput)
-            plt.plot(data_array[:, 1])
-            plt.show(block=False)
-
-        # max_y = max(max_y, max(bands[1:len(bands)]))
-
-        # plt.cla()
-        # plt.ylim([0,max_y])
-        # plt.bar(b[1:], bands[1:len(bands)//2], color="#7967e1")
-
-        # # bar = plt.bar(ind + width, bands[5:], width, color="green")
-
-        # # plt.xticks(ind + width / 2, bin_names)
+            plt.cla()
+            plt.plot(data_array[:,1])
+            plt.show(block = False)
 
         plt.pause(0.01)
-        time.sleep(1.25)
-
-    # plt.stem(freq, fftData, markerfmt=" ",)
-    # print(1000 / np.average(array[:,0]))
-    # # plt.stem(freq, array[:,1])
-    # print(array.shape)
-    # # print(freq.size)
-    # plt.show()
+        time.sleep(1)
 
 
 if __name__ == "__main__":
