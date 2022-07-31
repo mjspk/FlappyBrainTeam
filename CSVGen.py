@@ -1,4 +1,3 @@
-
 import random
 import time
 import EEGDataGen as dataGen
@@ -53,7 +52,7 @@ class CSVDataReader:
         size = 4
         final = str(readIn[0]) + ","
         for i in range(size):
-            final += str(readIn[1][i,:]) # type: ignore
+            final += str(readIn[1][i, :])  # type: ignore
             final += ","
         final += direction + "\n"
         file = open(fileName, "a")

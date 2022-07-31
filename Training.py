@@ -4,10 +4,9 @@ import numpy as np
 import os
 from tensorflow import keras
 from keras import layers
-from sklearn.preprocessing import StandardScaler, scale
 
 
-labels = ["left", "right", "Up", "Down", "Click"]
+labels = ["left", "right", "Up", "Down", "Blink"]
 # loop all csv files in the folder data/bin and create a dataframe
 def load_data():
     data = None
@@ -19,7 +18,7 @@ def load_data():
                 data = data.append(pd.read_csv("data/bin/" + filename))
 
     data.iloc[:, -1] = data.iloc[:, -1].map(
-        {"Left": 0, "Right": 1, "Up": 2, "Down": 3, "Click": 4}
+        {"Left": 0, "Right": 1, "Up": 2, "Down": 3, "Blink": 4}
     )
     return data
 
@@ -34,7 +33,6 @@ def split_data(data):
         x_test = data.iloc[int(len(data) * 0.9) :, :-1]
         y_test = data.iloc[int(len(data) * 0.9) :, -1]
         return x_train, y_train, x_val, y_val, x_test, y_test
-
     else:
         print("Data not found")
         return None
