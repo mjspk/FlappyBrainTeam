@@ -9,34 +9,13 @@ class Controling:
         size = pyautogui.size()
         self.width = size[0]
         self.height = size[1]
-        self.x = self.width / 2
-        self.y = self.height / 2
         self.prev_direction = None
         self.stop = False
 
-    def main(self):
-        while True:
-            if keyboard.getch().decode("utf-8") == "r":
-                print("Right")
-                self.move_mouse("Right", 0.5)
-            elif keyboard.getch().decode("utf-8") == "l":
-                print("Left")
-                self.move_mouse("Left", 0.5)
-            elif keyboard.getch().decode("utf-8") == "u":
-                print("Up")
-                self.move_mouse("Up", 0.5)
-            elif keyboard.getch().decode("utf-8") == "d":
-                print("Down")
-                self.move_mouse("Down", 0.5)
-            elif keyboard.getch().decode("utf-8") == "b":
-                print("Blink")
-                self.move_mouse("Blink", 0.5)
-            elif keyboard.getch().decode("utf-8") == "q":
-                print("Quit")
-                break
-
     def move_mouse(self, direction):
-
+        pos = pyautogui.position()
+        self.x = pos[0]
+        self.y = pos[1]
         if (direction == "r" and self.prev_direction == "l") or (
             direction == "l" and self.prev_direction == "r"
         ):
@@ -47,6 +26,34 @@ class Controling:
         ):
             self.stop = True
             self.prev_direction = None
+
+        elif direction == "r" and self.prev_direction == "u":
+            self.stop = True
+            t.sleep(0.1)
+            self.stop = False
+            self.prev_direction = "r"
+            threading.Thread(target=self.move_loop, args=("ru", 1)).start()
+
+        elif direction == "r" and self.prev_direction == "d":
+            self.stop = True
+            t.sleep(0.1)
+            self.stop = False
+            self.prev_direction = "r"
+            threading.Thread(target=self.move_loop, args=("rd", 1)).start()
+
+        elif direction == "l" and self.prev_direction == "u":
+            self.stop = True
+            t.sleep(0.1)
+            self.stop = False
+            self.prev_direction = "l"
+            threading.Thread(target=self.move_loop, args=("lu", 1)).start()
+
+        elif direction == "l" and self.prev_direction == "d":
+            self.stop = True
+            t.sleep(0.1)
+            self.stop = False
+            self.prev_direction = "l"
+            threading.Thread(target=self.move_loop, args=("ld", 1)).start()
 
         elif direction == "rl":
             self.stop = False
@@ -118,6 +125,35 @@ class Controling:
                     self.y += 10
                     pyautogui.moveTo(self.x, self.y)
 
+            elif direction == "ru":
+                if self.x < self.width:
+                    self.x += 10
+                    pyautogui.moveTo(self.x, self.y)
+                if self.y > 0:
+                    self.y -= 10
+                    pyautogui.moveTo(self.x, self.y)
+            elif direction == "lu":
+                if self.x > 0:
+                    self.x -= 10
+                    pyautogui.moveTo(self.x, self.y)
+                if self.y > 0:
+                    self.y -= 10
+                    pyautogui.moveTo(self.x, self.y)
+            elif direction == "rd":
+                if self.x < self.width:
+                    self.x += 10
+                    pyautogui.moveTo(self.x, self.y)
+                if self.y < self.height:
+                    self.y += 10
+                    pyautogui.moveTo(self.x, self.y)
+            elif direction == "ld":
+                if self.x > 0:
+                    self.x -= 10
+                    pyautogui.moveTo(self.x, self.y)
+                if self.y < self.height:
+                    self.y += 10
+                    pyautogui.moveTo(self.x, self.y)
+
         else:
             while True:
                 if direction == "r":
@@ -136,11 +172,35 @@ class Controling:
                     if self.y < self.height:
                         self.y += 10
                         pyautogui.moveTo(self.x, self.y)
+                elif direction == "ru":
+                    if self.x < self.width:
+                        self.x += 10
+                        pyautogui.moveTo(self.x, self.y)
+                    if self.y > 0:
+                        self.y -= 10
+                        pyautogui.moveTo(self.x, self.y)
+                elif direction == "lu":
+                    if self.x > 0:
+                        self.x -= 10
+                        pyautogui.moveTo(self.x, self.y)
+                    if self.y > 0:
+                        self.y -= 10
+                        pyautogui.moveTo(self.x, self.y)
+                elif direction == "rd":
+                    if self.x < self.width:
+                        self.x += 10
+                        pyautogui.moveTo(self.x, self.y)
+                    if self.y < self.height:
+                        self.y += 10
+                        pyautogui.moveTo(self.x, self.y)
+                elif direction == "ld":
+                    if self.x > 0:
+                        self.x -= 10
+                        pyautogui.moveTo(self.x, self.y)
+                    if self.y < self.height:
+                        self.y += 10
+                        pyautogui.moveTo(self.x, self.y)
+
                 t.sleep(0.1)
                 if self.stop:
                     break
-
-
-if __name__ == "__main__":
-    cn = Controling(960, 540)
-    cn.main()
