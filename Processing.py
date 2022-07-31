@@ -8,7 +8,7 @@ from queue import Queue
 class DataReader:
     def __init__(self, buffer_length):
 
-        self.ser = serial.Serial("COM7", 115200, timeout=0.00001)
+        self.ser = serial.Serial("COM4", 115200, timeout=0.00001)
         self.ser.flushInput()
         self.ser.flushOutput()
 
