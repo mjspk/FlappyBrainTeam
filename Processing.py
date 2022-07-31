@@ -15,7 +15,7 @@ class DataReader:
         time.sleep(5)
         self.data = Queue(buffer_length)
         self.bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
-        self.bands = [4, 8, 12, 30, 100]
+        self.bands = [1, 2, 4, 5, 6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 
     def get_data(self, plot=False):
 
@@ -58,11 +58,63 @@ class DataReader:
                 # bandsData = bandsData.reshape((x, y))
 
         if plot:
+            plt.plot(data_array)
             plt.stem(freq, fftReading, markerfmt=" ")
+            plt.legend()
             plt.show(block=True)
 
         # Return results of the fourier transform
         return freq, fftData, bandsData
+
+
+    def get_data2(self, plot=False):
+
+        self.read_serial()
+
+        # Convert the data left in the queue to a numpy array
+        while not self.data.full():
+            time.sleep(0.1)
+            self.read_serial()
+
+        data_array = np.array(self.data.queue)
+        freq = np.fft.fftfreq(data_array.shape[0]) * np.average(data_array[0, 0])
+
+        freq = freq[0 : len(freq) // 2]
+
+        fftData = None
+        bandsData = None
+
+        for i in range(1, data_array.shape[1]):
+
+            # Do a FFT on the data
+            fftReading = np.fft.fft(data_array[:, i])
+            fftReading = fftReading[0 : len(fftReading) // 2]
+            fftReading = np.sqrt(fftReading.real**2 + fftReading.imag**2)
+
+            if fftData is None:
+                fftData = fftReading
+            else:
+                fftData = np.vstack((fftData, fftReading))
+                # y, x = fftData.shape
+                # fftData = fftData.reshape((x, y))
+
+            bands = self.create_bands(freq, fftReading)
+
+            if bandsData is None:
+                bandsData = bands
+            else:
+                bandsData = np.hstack((bandsData, bands))
+                # y, x = bandsData.shape
+                # bandsData = bandsData.reshape((x, y))
+
+        if plot:
+            plt.plot(data_array)
+            plt.stem(freq, fftReading, markerfmt=" ")
+            plt.legend()
+            plt.show(block=True)
+
+        # Return results of the fourier transform
+        return bandsData, data_array
 
     def read_serial(self):
 
@@ -90,7 +142,7 @@ class DataReader:
                     input_list = list(map(float, input_s_array))
                     input_array = np.array(input_list)
 
-                    if len(input_array) == 5:
+                    if len(input_array) == 3:
 
                         if self.data.full():
                             self.data.get()
@@ -106,6 +158,9 @@ class DataReader:
 
     def get_names(self):
         return self.bin_names
+
+    def get_bands(self):
+        return self.bands 
 
     def create_bands(self, frequencies, amplitudes):
 
@@ -123,6 +178,22 @@ class DataReader:
 
         return band_average
 
+    def left_right_input(self):
+
+        bands, data_array = self.get_data2()
+
+        if (np.average(bands[1:4]) > 750):
+
+            LR_data = data_array[:,1]
+
+            if np.argmin(LR_data) < np.argmax(LR_data):
+                return "right"
+            else:
+                return "left"
+
+        return None
+
+
 
 def plot_bands(bands, bin_names):
     plt.ylabel("Amplitude")
@@ -134,7 +205,7 @@ def plot_bands(bands, bin_names):
 def main():
 
     # Create Data reader with a queue length
-    dr = DataReader(500)
+    dr = DataReader(100)
 
     bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
     bin_range = [4, 8, 12, 30, 100]
@@ -144,31 +215,53 @@ def main():
     # frequencies, amplitudes, bands = dr.get_data()
     # bar = ax.bar(bin_names, bands, color="#7967e1")
 
-    plt.show(block=False)
+    # plt.show(block=False)
     ax = plt.gca()
     plt.ylabel("Amplitude")
 
     ind = np.arange(5)
     width = 0.35
 
+    print("Recording")
+
     frequencies, amplitudes, bands = dr.get_data()
+    b = dr.get_bands()
+
+    max_y = 100
+
 
     while True:
 
-        frequencies, amplitudes, bands = dr.get_data()
+        bands, data_array = dr.get_data2()
 
-        y, x = bands.shape
-        bands = bands.reshape((x, y))
-        bin_names
+        # y, x = bands.shape
+        # bands = bands.reshape((x, y))
+        # bin_names
 
-        plt.cla()
-        bar = plt.bar(ind, bands[:, 0], width, color="#7967e1")
-        bar = plt.bar(ind + width, bands[:, 1], width, color="green")
+        isInput = dr.left_right_input()
 
-        plt.xticks(ind + width / 2, bin_names)
+        if isInput:
+            print(isInput)
+            plt.plot(data_array[:,1])
+            plt.show(block = False)
+        
+
+        # max_y = max(max_y, max(bands[1:len(bands)]))
+
+
+            
+
+        
+        # plt.cla()
+        # plt.ylim([0,max_y])
+        # plt.bar(b[1:], bands[1:len(bands)//2], color="#7967e1")
+
+        # # bar = plt.bar(ind + width, bands[5:], width, color="green")
+
+        # # plt.xticks(ind + width / 2, bin_names)
 
         plt.pause(0.01)
-        time.sleep(1)
+        time.sleep(1.25)
 
     # plt.stem(freq, fftData, markerfmt=" ",)
     # print(1000 / np.average(array[:,0]))
