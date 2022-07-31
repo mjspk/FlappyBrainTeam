@@ -42,8 +42,8 @@ class CSVDataReader:
         size = 5
         final = ""
         for i in range(size):
-            final += str(readIn[2][i])
-            final += ", "
+            final += str(round(readIn[2][i]))
+            final += ","
         final += direction + "\n"
         file = open(fileName, "a")
         file.write(final)
