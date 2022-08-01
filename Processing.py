@@ -14,7 +14,7 @@ class DataReader:
         self.ser.flushOutput()
 
         time.sleep(5)
-        self.data = Queue(100)
+        self.data = Queue(80)
         self.bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
         self.bands = [
             1,
@@ -218,16 +218,17 @@ class DataReader:
 
         # print(f"Side: {side_data}, Vertical: {vert_data}")
 
-        
-
-        if side_data < 900 and vert_data < 800:
+        if side_data < 800 and vert_data < 600:
             return None, bands
 
         print(f"Side Sensors: {side_data}, Vertical Sensors {vert_data}")
 
-        if side_data > 900:
+        if side_data > 800:
             # look for a side to side input
             LR_data = data_array[:,1]
+
+            if ((np.average(LR_data) - np.min(LR_data)) > 1.8 * (np.max(LR_data) - np.average(LR_data))):
+                return "rb", bands
 
             if np.argmin(LR_data) < np.argmax(LR_data):
                 return "r", bands
