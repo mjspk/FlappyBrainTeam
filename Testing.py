@@ -11,7 +11,14 @@ import pyautogui as pyautogui
 
 
 class EEGDataGen:
+    """
+    This class tests the program by calling for data from the DataReader class and telling the Controlling class to move the mouse
+    """
+
     def Model_test(self):
+        """
+        Method to test the ai model agains the filtered output
+        """
 
         model = load_model()
         cn = Controling()
@@ -38,6 +45,9 @@ class EEGDataGen:
             cn.move_mouse(predicted_direction, 0.5)
 
     def test(self):
+        """
+        Method to test the program reading data from the serial port and moving the mouse around the screen
+        """
         cn = Controling()
         cs = CSVDataReader()
         cs.makeHeader()
