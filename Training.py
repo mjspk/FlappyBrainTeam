@@ -6,24 +6,25 @@ from tensorflow import keras
 from keras import layers
 
 
-labels = ["left", "right", "Up", "Down", "Blink"]
+labels = ["l", "r", "u", "d", "b"]
 # loop all csv files in the folder data/bin and create a dataframe
 def load_data():
     data = None
     for filename in os.listdir("data/bin"):
         if filename.endswith(".csv"):
             if data is None:
-                data = pd.read_csv("data/bin/" + filename)
+                data = pd.read_csv("data/bin/" + filename, header=None)
             else:
-                data = data.append(pd.read_csv("data/bin/" + filename))
+                data = data.append(pd.read_csv("data/bin/" + filename, header=None))
 
-    data.iloc[:, -1] = data.iloc[:, -1].map(
-        {"Left": 0, "Right": 1, "Up": 2, "Down": 3, "Blink": 4}
-    )
+    # write data to csv file
+    data.to_csv("data/data2.csv", index=False)
+    data.iloc[:, -1] = data.iloc[:, -1].map({"l": 0, "r": 1, "u": 2, "d": 3, "b": 4})
+    # data.dropna()
+    print(data)
     return data
 
 
-# split data into train,aval and test
 def split_data(data):
     if data is not None:
         x_train = data.iloc[0 : int(len(data) * 0.8), :-1]
@@ -32,6 +33,7 @@ def split_data(data):
         y_val = data.iloc[int(len(data) * 0.8) : int(len(data) * 0.9), -1]
         x_test = data.iloc[int(len(data) * 0.9) :, :-1]
         y_test = data.iloc[int(len(data) * 0.9) :, -1]
+
         return x_train, y_train, x_val, y_val, x_test, y_test
     else:
         print("Data not found")
@@ -39,14 +41,13 @@ def split_data(data):
 
 
 def create_model():
-    inputs = keras.Input(shape=(10,), name="digits")
-    x = layers.Dense(64, activation="relu", name="dense_1")(inputs)
-    outputs = layers.Dense(1, activation="sigmoid", name="predictions")(x)
+    inputs = keras.Input(shape=(38,), name="digits")
+    x = layers.Flatten()(inputs)
+    x = layers.Dense(38, activation="relu", name="dense_1")
+    outputs = layers.Dense(5, activation="sgd", name="output")(x)
     model = keras.Model(inputs=inputs, outputs=outputs)
     model.compile(
-        optimizer=keras.optimizers.Adam(),
-        loss=keras.losses.BinaryCrossentropy(from_logits=True),
-        metrics=["accuracy"],
+        optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
     )
     return model
 

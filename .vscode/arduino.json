@@ -2,5 +2,5 @@
     "port": "COM7",
     "board": "arduino:avr:uno",
     "programmer": "arduino:avrisp",
-    "sketch": "EEGFilter\\EEGFilter.ino"
+    "sketch": "EOG_Filter\\EOG_Filter\\EOG_Filter.ino"
 }

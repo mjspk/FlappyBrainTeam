@@ -8,7 +8,7 @@ from queue import Queue
 class DataReader:
     def __init__(self):
 
-        self.ser = serial.Serial("COM4", 115200, timeout=0.00001)
+        self.ser = serial.Serial("COM7", 115200, timeout=0.00001)
 
         self.ser.flushInput()
         self.ser.flushOutput()
@@ -124,7 +124,7 @@ class DataReader:
         input_raw = self.ser.readline()
         input_decoded = input_raw.decode()
 
-        last = [0,0,0]
+        last = [0, 0, 0]
 
         # Read in data until the end of the file
         # while len(input_decoded) > 3 and input_decoded[-3] == ">":
@@ -159,7 +159,7 @@ class DataReader:
                 input_raw = self.ser.readline()
                 input_decoded = input_raw.decode()
 
-        if last[1] < 450 or last[1] > 550 or last[-1] < 450 or last [-1] > 550:
+        if last[1] < 450 or last[1] > 550 or last[-1] < 450 or last[-1] > 550:
             time.sleep(0.1)
             self.read_serial()
 
@@ -191,19 +191,19 @@ class DataReader:
 
         l = len(bands)
         side_data = np.average(bands[1:4])
-        vert_data = np.average(bands[l//2+1:l//2+4])
+        vert_data = np.average(bands[l // 2 + 1 : l // 2 + 4])
 
         if side_data < 800 and vert_data < 600:
             return None, bands
 
         print(f"Side Sensors: {side_data}, Vertical Sensors {vert_data}")
 
-        if side_data > 800:
+        if side_data > 900:
             # look for a side to side input
-            LR_data = data_array[:,1]
+            LR_data = data_array[:, 1]
 
             if ((np.average(LR_data) - np.min(LR_data)) > 1.8 * (np.max(LR_data) - np.average(LR_data))):
-                return "rb", bands
+                return "b", bands
 
             if np.argmin(LR_data) < np.argmax(LR_data):
                 return "r", bands
@@ -212,7 +212,7 @@ class DataReader:
 
         else:
             # look for a vertical input
-            UD_data = data_array[:,2]
+            UD_data = data_array[:, 2]
 
             if np.argmin(UD_data) < np.argmax(UD_data):
 
@@ -249,9 +249,9 @@ def main():
         if isInput:
             print(isInput)
             plt.cla()
-            plt.plot(data_array[:,1])
-            plt.plot(data_array[:,2])
-            plt.show(block = False)
+            plt.plot(data_array[:, 1])
+            plt.plot(data_array[:, 2])
+            plt.show(block=False)
 
         plt.pause(0.01)
         time.sleep(1)

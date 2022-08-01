@@ -18,11 +18,7 @@ def load_data():
                 data = pd.read_csv("data/bin/" + filename)
             else:
                 data = data.append(pd.read_csv("data/bin/" + filename))
-    data = data[~data["Direction"].str.contains("Backward")]
-    data = data[~data["Direction"].str.contains("Forward")]
-    data.iloc[:, -1] = data.iloc[:, -1].map({"Left": 0, "Right": 1})
-
-    data = data.drop(columns=["GammaRight", "GammaLeft"])
+    data.iloc[:, -1] = data.iloc[:, -1].map({"l": 0, "r": 1, "u": 2, "d": 3, "b": 4})
     return data
 
 
