@@ -1,6 +1,5 @@
 import random
 import time
-import mouse as m
 import numpy as np
 from CSVGen import CSVDataReader
 from Controling import Controling
@@ -41,7 +40,7 @@ class EEGDataGen:
         cn = Controling()
         cs = CSVDataReader()
         cs.makeHeader()
-        dr = DataReader(75)
+        dr = DataReader(80)
         while True:
             direction, bands = dr.left_right_input()
             if direction is not None:
@@ -50,7 +49,7 @@ class EEGDataGen:
                 print("Predicted: " + direction)
             else:
                 print("No direction")
-            time.sleep(1.4)
+            time.sleep(1)
 
 
 if __name__ == "__main__":

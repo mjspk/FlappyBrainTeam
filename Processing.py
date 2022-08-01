@@ -14,7 +14,7 @@ class DataReader:
         self.ser.flushOutput()
 
         time.sleep(5)
-        self.data = Queue(buffer_length)
+        self.data = Queue(100)
         self.bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
         self.bands = [
             1,
@@ -144,6 +144,8 @@ class DataReader:
         input_raw = self.ser.readline()
         input_decoded = input_raw.decode()
 
+        last = [0,0,0]
+
         # Read in data until the end of the file
         # while len(input_decoded) > 3 and input_decoded[-3] == ">":
         while self.ser.inWaiting() > 1:
@@ -167,6 +169,7 @@ class DataReader:
                         if self.data.full():
                             self.data.get()
 
+                        last = input_array
                         self.data.put(input_array)
 
                     input_raw = self.ser.readline()
@@ -175,6 +178,10 @@ class DataReader:
             except:
                 input_raw = self.ser.readline()
                 input_decoded = input_raw.decode()
+
+        if last[1] < 450 or last[1] > 550 or last[-1] < 450 or last [-1] > 550:
+            time.sleep(0.1)
+            self.read_serial()
 
     def get_names(self):
         return self.bin_names
@@ -206,16 +213,19 @@ class DataReader:
         # vert_data = np.average(bands[len(bands)//2+1:len(bands)//2+4])
         
         l = len(bands)
-        side_data = np.average(bands[1:l//2])
-        vert_data = np.average(bands[l//2+2:])
+        side_data = np.average(bands[1:4])
+        vert_data = np.average(bands[l//2+1:l//2+4])
 
         # print(f"Side: {side_data}, Vertical: {vert_data}")
 
-        if max(side_data, vert_data) < 200:
+        
+
+        if side_data < 900 and vert_data < 800:
             return None, bands
 
+        print(f"Side Sensors: {side_data}, Vertical Sensors {vert_data}")
 
-        if side_data > vert_data:
+        if side_data > 900:
             # look for a side to side input
             LR_data = data_array[:,1]
 
@@ -229,7 +239,11 @@ class DataReader:
             UD_data = data_array[:,2]
 
             if np.argmin(UD_data) < np.argmax(UD_data):
-                return "u", bands
+
+                if np.max(UD_data) < 600:
+                    return "b", bands
+                else:
+                    return "u", bands
             else:
                 return "d", bands
 
@@ -272,16 +286,13 @@ def main():
 
         bands, data_array = dr.get_data2()
 
-        # y, x = bands.shape
-        # bands = bands.reshape((x, y))
-        # bin_names
-
-        isInput = dr.left_right_input()
+        isInput, bands = dr.left_right_input()
 
         if isInput:
             print(isInput)
             plt.cla()
             plt.plot(data_array[:,1])
+            plt.plot(data_array[:,2])
             plt.show(block = False)
 
         plt.pause(0.01)
