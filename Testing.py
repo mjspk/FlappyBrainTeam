@@ -7,6 +7,7 @@ from Processing import DataReader
 from Training import load_model
 from Training import labels
 import msvcrt as keyboard
+import pyautogui as pyautogui
 
 
 class EEGDataGen:
@@ -41,6 +42,7 @@ class EEGDataGen:
         cs = CSVDataReader()
         cs.makeHeader()
         dr = DataReader(80)
+        pyautogui.FAILSAFE = False
         while True:
             direction, bands = dr.left_right_input()
             if direction is not None:

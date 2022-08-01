@@ -11,6 +11,7 @@ class Controling:
         self.height = size[1]
         self.prev_direction = None
         self.stop = False
+        self.step = 5
 
     def move_mouse(self, direction):
         pos = pyautogui.position()
@@ -92,14 +93,18 @@ class Controling:
             threading.Thread(target=self.move_loop, args=("d", 1)).start()
             self.prev_direction = "d"
         elif direction == "b":
-            self.stop = False
+            self.stop = True
+            t.sleep(0.1)
             pyautogui.click()
             self.prev_direction = None
-        elif direction == "bb":
-            self.stop = False
+        elif direction == "b" and self.prev_direction == "b":
+            self.stop = True
+            t.sleep(0.1)
             pyautogui.doubleClick()
             self.prev_direction = None
         elif direction == "rb":
+            self.stop = True
+            t.sleep(0.1)
             self.stop = False
             pyautogui.rightClick()
             self.prev_direction = None
@@ -108,136 +113,136 @@ class Controling:
         if time == 0:
             if direction == "r":
                 if self.x < self.width:
-                    self.x += 10
+                    self.x += self.step
                     pyautogui.moveTo(self.x, self.y)
             elif direction == "l":
                 if self.x > 0:
-                    self.x -= 10
+                    self.x -= self.step
                     pyautogui.moveTo(self.x, self.y)
             elif direction == "u":
                 if self.y > 0:
-                    self.y -= 10
+                    self.y -= self.step
                     pyautogui.moveTo(self.x, self.y)
             elif direction == "d":
                 if self.y < self.height:
-                    self.y += 10
+                    self.y += self.step
                     pyautogui.moveTo(self.x, self.y)
 
             elif direction == "ru":
                 if self.x < self.width and self.y > 0:
-                    self.x += 10
-                    self.y -= 10
+                    self.x += self.step
+                    self.y -= self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.x < self.width:
-                    self.x += 10
+                    self.x += self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.y > 0:
-                    self.y -= 10
+                    self.y -= self.step
                     pyautogui.moveTo(self.x, self.y)
 
             elif direction == "rd":
                 if self.x < self.width and self.y < self.height:
-                    self.x += 10
-                    self.y += 10
+                    self.x += self.step
+                    self.y += self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.x < self.width:
-                    self.x += 10
+                    self.x += self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.y < self.height:
-                    self.y += 10
+                    self.y += self.step
                     pyautogui.moveTo(self.x, self.y)
 
             elif direction == "lu":
                 if self.x > 0 and self.y > 0:
-                    self.x -= 10
-                    self.y -= 10
+                    self.x -= self.step
+                    self.y -= self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.x > 0:
-                    self.x -= 10
+                    self.x -= self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.y > 0:
-                    self.y -= 10
+                    self.y -= self.step
                     pyautogui.moveTo(self.x, self.y)
 
             elif direction == "ld":
                 if self.x > 0 and self.y < self.height:
-                    self.x -= 10
-                    self.y += 10
+                    self.x -= self.step
+                    self.y += self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.x > 0:
-                    self.x -= 10
+                    self.x -= self.step
                     pyautogui.moveTo(self.x, self.y)
                 elif self.y < self.height:
-                    self.y += 10
+                    self.y += self.step
                     pyautogui.moveTo(self.x, self.y)
 
         else:
             while True:
                 if direction == "r":
                     if self.x < self.width:
-                        self.x += 10
+                        self.x += self.step
                         pyautogui.moveTo(self.x, self.y)
                 elif direction == "l":
                     if self.x > 0:
-                        self.x -= 10
+                        self.x -= self.step
                         pyautogui.moveTo(self.x, self.y)
                 elif direction == "u":
                     if self.y > 0:
-                        self.y -= 10
+                        self.y -= self.step
                         pyautogui.moveTo(self.x, self.y)
                 elif direction == "d":
                     if self.y < self.height:
-                        self.y += 10
+                        self.y += self.step
                         pyautogui.moveTo(self.x, self.y)
 
                 elif direction == "ru":
                     if self.x < self.width and self.y > 0:
-                        self.x += 10
-                        self.y -= 10
+                        self.x += self.step
+                        self.y -= self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.x < self.width:
-                        self.x += 10
+                        self.x += self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.y > 0:
-                        self.y -= 10
+                        self.y -= self.step
                         pyautogui.moveTo(self.x, self.y)
 
                 elif direction == "rd":
                     if self.x < self.width and self.y < self.height:
-                        self.x += 10
-                        self.y += 10
+                        self.x += self.step
+                        self.y += self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.x < self.width:
-                        self.x += 10
+                        self.x += self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.y < self.height:
-                        self.y += 10
+                        self.y += self.step
                         pyautogui.moveTo(self.x, self.y)
 
                 elif direction == "lu":
                     if self.x > 0 and self.y > 0:
-                        self.x -= 10
-                        self.y -= 10
+                        self.x -= self.step
+                        self.y -= self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.x > 0:
-                        self.x -= 10
+                        self.x -= self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.y > 0:
-                        self.y -= 10
+                        self.y -= self.step
                         pyautogui.moveTo(self.x, self.y)
 
                 elif direction == "ld":
                     if self.x > 0 and self.y < self.height:
-                        self.x -= 10
-                        self.y += 10
+                        self.x -= self.step
+                        self.y += self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.x > 0:
-                        self.x -= 10
+                        self.x -= self.step
                         pyautogui.moveTo(self.x, self.y)
                     elif self.y < self.height:
-                        self.y += 10
+                        self.y += self.step
                         pyautogui.moveTo(self.x, self.y)
 
-                t.sleep(0.1)
+                t.sleep(0.01)
                 if self.stop:
                     break
