@@ -5,6 +5,9 @@ import msvcrt as keyboard
 
 
 class Controling:
+    """
+    Class to control the mouse on the computer from python
+    """
     def __init__(self):
         size = pyautogui.size()
         self.width = size[0]
@@ -14,6 +17,9 @@ class Controling:
         self.step = 8
 
     def move_mouse(self, direction):
+        """
+        Method to determine which direction to move the mouse
+        """
         pos = pyautogui.position()
         self.x = pos[0]
         self.y = pos[1]
@@ -110,6 +116,9 @@ class Controling:
             self.prev_direction = None
 
     def move_loop(self, direction, time):
+        """
+        Method to move the mouse in the specified direction for the aloted time
+        """
         if time == 0:
             if direction == "r":
                 if self.x < self.width:

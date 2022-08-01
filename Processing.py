@@ -6,7 +6,14 @@ from queue import Queue
 
 
 class DataReader:
+    """
+    This class reads data from the serial port and analyzes it to identify the most recent input when prompted by another file
+    """
+
     def __init__(self):
+        """
+        Initialize serial port and datastructure, establish bin intervals for frequency response
+        """
 
         self.ser = serial.Serial("COM7", 115200, timeout=0.00001)
 
@@ -19,6 +26,11 @@ class DataReader:
         self.bands = [1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,]
 
     def get_data(self, plot=False):
+        """
+        Method calls for data from the serial port, analyzes it with a FFT and bins the data. 
+        The binned data can be returned, and a plot of the data from the FFT can be shown if plot is set to true
+        
+        """
 
         self.read_serial()
 
@@ -68,6 +80,11 @@ class DataReader:
         return freq, fftData, bandsData
 
     def get_direction(self, plot=False):
+        """
+        This method determines the direction of the last input based on the recent readings from the serial port
+        The return is a string indicating which direction to move the cursor and the binned data that is based on 
+        which can later be used for a machine learning algorithm
+        """
 
         self.read_serial()
 
@@ -117,6 +134,9 @@ class DataReader:
         return bandsData, data_array
 
     def read_serial(self):
+        """
+        This method reads the serial input and updates the data queue. It filters out invalid data and leave the most recent data on the queue
+        """
 
         # Throw away top line
         self.ser.readline()
@@ -225,6 +245,9 @@ class DataReader:
 
 
 def plot_bands(bands, bin_names):
+    """
+    This method plots a histagram showing the results of a fourier transform after binning
+    """
     plt.ylabel("Amplitude")
     plt.bar(bin_names, bands, color="#7967e1")
     plt.show()
@@ -232,6 +255,10 @@ def plot_bands(bands, bin_names):
 
 
 def main():
+    """
+    Main function for testing the DataReader class
+    """
+    
 
     # Create Data reader with a queue length
     dr = DataReader()
