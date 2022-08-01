@@ -24,7 +24,7 @@ These classes are used for future application improvement. Both raw and transfor
 
 #### Future improvements:
 
-Use TensorFlow to improve recognition of the inputs. Use EEG data rather than EOG artifacts.
+Use TensorFlow and EEG data to improve recognition. Implement project into stand alone device.
 
 #### Video tutorial
 
