@@ -28,5 +28,4 @@ Use TensorFlow to improve recognition of the inputs. Use EEG data rather than EO
 
 #### Video tutorial
 
-[![Watch the video](https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2019/09/YouTube-thumbnail-size-guide-best-practices-top-examples.png.webp)](https://youtu.be/bT--9shzQcU)
-
+[![Watch the video](https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2019/09/YouTube-thumbnail-size-guide-best-practices-top-examples.png.webp)](https://youtu.be/8hNw2gWGpAQ)
