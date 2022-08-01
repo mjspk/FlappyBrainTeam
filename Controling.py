@@ -16,64 +16,62 @@ class Controling:
         pos = pyautogui.position()
         self.x = pos[0]
         self.y = pos[1]
-        if (direction == "r" and self.prev_direction == "l") or (
-            direction == "l" and self.prev_direction == "r"
-        ):
-            self.stop = True
-            self.prev_direction = None
-        elif (direction == "u" and self.prev_direction == "d") or (
-            direction == "d" and self.prev_direction == "u"
+        if (
+            (direction == "r" and self.prev_direction == "l")
+            or (direction == "l" and self.prev_direction == "r")
+            or (direction == "u" and self.prev_direction == "d")
+            or (direction == "d" and self.prev_direction == "u")
+            or (direction == "l" and self.prev_direction == "rd")
+            or (direction == "r" and self.prev_direction == "ld")
+            or (direction == "r" and self.prev_direction == "lu")
+            or (direction == "l" and self.prev_direction == "ru")
+            or (direction == "u" and self.prev_direction == "rd")
+            or (direction == "u" and self.prev_direction == "ld")
+            or (direction == "d" and self.prev_direction == "ru")
+            or (direction == "d" and self.prev_direction == "lu")
         ):
             self.stop = True
             self.prev_direction = None
 
-        elif direction == "r" and self.prev_direction == "u":
+        elif (
+            direction == "r"
+            and self.prev_direction == "u"
+            or (direction == "u" and self.prev_direction == "r")
+        ):
             self.stop = True
             t.sleep(0.1)
             self.stop = False
-            self.prev_direction = "r"
+            self.prev_direction = "ru"
             threading.Thread(target=self.move_loop, args=("ru", 1)).start()
 
-        elif direction == "r" and self.prev_direction == "d":
+        elif (
+            direction == "r"
+            and self.prev_direction == "d"
+            or (direction == "d" and self.prev_direction == "r")
+        ):
             self.stop = True
             t.sleep(0.1)
             self.stop = False
-            self.prev_direction = "r"
+            self.prev_direction = "rd"
             threading.Thread(target=self.move_loop, args=("rd", 1)).start()
 
-        elif direction == "l" and self.prev_direction == "u":
+        elif (direction == "l" and self.prev_direction == "u") or (
+            direction == "u" and self.prev_direction == "l"
+        ):
             self.stop = True
             t.sleep(0.1)
             self.stop = False
-            self.prev_direction = "l"
+            self.prev_direction = "lu"
             threading.Thread(target=self.move_loop, args=("lu", 1)).start()
 
-        elif direction == "l" and self.prev_direction == "d":
+        elif (direction == "l" and self.prev_direction == "d") or (
+            direction == "d" and self.prev_direction == "l"
+        ):
             self.stop = True
             t.sleep(0.1)
             self.stop = False
-            self.prev_direction = "l"
+            self.prev_direction = "ld"
             threading.Thread(target=self.move_loop, args=("ld", 1)).start()
-
-        elif direction == "rl":
-            self.stop = False
-            self.move_loop("r", 0)
-            self.prev_direction = "r"
-
-        elif direction == "lr":
-            self.stop = False
-            self.move_loop("l", 0)
-            self.prev_direction = "l"
-
-        elif direction == "ud":
-            self.stop = False
-            self.move_loop("u", 0)
-            self.prev_direction = "u"
-
-        elif direction == "du":
-            self.stop = False
-            self.move_loop("d", 0)
-            self.prev_direction = "d"
 
         elif direction == "l":
             self.stop = False
