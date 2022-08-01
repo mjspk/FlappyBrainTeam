@@ -19,7 +19,7 @@ class EEGDataGen:
             print("Model loaded")
         else:
             print("Model not found")
-        dr = DataReader(500)
+        dr = DataReader()
         while True:
             freq, fftData, bands = dr.get_data()
             bands = np.rint(bands)
@@ -41,10 +41,10 @@ class EEGDataGen:
         cn = Controling()
         cs = CSVDataReader()
         cs.makeHeader()
-        dr = DataReader(80)
+        dr = DataReader()
         pyautogui.FAILSAFE = False
         while True:
-            direction, bands = dr.left_right_input()
+            direction, bands = dr.compute_input()
             if direction is not None:
                 cn.move_mouse(direction)
                 cs.writeFile(direction, bands)

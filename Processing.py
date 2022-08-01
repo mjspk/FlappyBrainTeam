@@ -6,7 +6,7 @@ from queue import Queue
 
 
 class DataReader:
-    def __init__(self, buffer_length):
+    def __init__(self):
 
         self.ser = serial.Serial("COM4", 115200, timeout=0.00001)
 
@@ -16,27 +16,7 @@ class DataReader:
         time.sleep(5)
         self.data = Queue(80)
         self.bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
-        self.bands = [
-            1,
-            2,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-        ]
+        self.bands = [1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,]
 
     def get_data(self, plot=False):
 
@@ -87,7 +67,7 @@ class DataReader:
         # Return results of the fourier transform
         return freq, fftData, bandsData
 
-    def get_data2(self, plot=False):
+    def get_direction(self, plot=False):
 
         self.read_serial()
 
@@ -205,18 +185,13 @@ class DataReader:
 
         return band_average
 
-    def left_right_input(self):
+    def compute_input(self):
 
-        bands, data_array = self.get_data2()
+        bands, data_array = self.get_direction()
 
-        # side_data = np.average(bands[1:4])
-        # vert_data = np.average(bands[len(bands)//2+1:len(bands)//2+4])
-        
         l = len(bands)
         side_data = np.average(bands[1:4])
         vert_data = np.average(bands[l//2+1:l//2+4])
-
-        # print(f"Side: {side_data}, Vertical: {vert_data}")
 
         if side_data < 800 and vert_data < 600:
             return None, bands
@@ -241,7 +216,7 @@ class DataReader:
 
             if np.argmin(UD_data) < np.argmax(UD_data):
 
-                if np.max(UD_data) < 600:
+                if np.max(UD_data) < 650:
                     return "b", bands
                 else:
                     return "u", bands
@@ -259,35 +234,17 @@ def plot_bands(bands, bin_names):
 def main():
 
     # Create Data reader with a queue length
-    dr = DataReader(100)
-
-    bin_names = ["Delta", "Theta", "Alpha", "Beta", "Gamma"]
-    bin_range = [4, 8, 12, 30, 100]
+    dr = DataReader()
 
     plt.ion()
 
-    # frequencies, amplitudes, bands = dr.get_data()
-    # bar = ax.bar(bin_names, bands, color="#7967e1")
-
-    # plt.show(block=False)
-    ax = plt.gca()
-    plt.ylabel("Amplitude")
-
-    ind = np.arange(5)
-    width = 0.35
-
-    print("Recording")
-
-    frequencies, amplitudes, bands = dr.get_data()
-    b = dr.get_bands()
-
-    max_y = 100
+    print("Start Reading")
 
     while True:
 
-        bands, data_array = dr.get_data2()
+        bands, data_array = dr.get_direction()
 
-        isInput, bands = dr.left_right_input()
+        isInput, bands = dr.compute_input()
 
         if isInput:
             print(isInput)
@@ -298,7 +255,6 @@ def main():
 
         plt.pause(0.01)
         time.sleep(1)
-
 
 if __name__ == "__main__":
     main()
