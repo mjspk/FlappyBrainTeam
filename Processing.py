@@ -218,21 +218,17 @@ class DataReader:
 
         # print(f"Side: {side_data}, Vertical: {vert_data}")
 
-<<<<<<< HEAD
         if side_data < 900 and vert_data < 800:
-=======
-        if side_data < 800 and vert_data < 600:
->>>>>>> 36fc7075b2a9c0279112b3563f88ae6c6cf5a13f
             return None, bands
 
         print(f"Side Sensors: {side_data}, Vertical Sensors {vert_data}")
 
-        if side_data > 800:
+        if side_data > 900:
             # look for a side to side input
             LR_data = data_array[:, 1]
 
             if ((np.average(LR_data) - np.min(LR_data)) > 1.8 * (np.max(LR_data) - np.average(LR_data))):
-                return "rb", bands
+                return "b", bands
 
             if np.argmin(LR_data) < np.argmax(LR_data):
                 return "r", bands
@@ -246,7 +242,7 @@ class DataReader:
             if np.argmin(UD_data) < np.argmax(UD_data):
 
                 if np.max(UD_data) < 600:
-                    return "b", bands
+                    return "rb", bands
                 else:
                     return "u", bands
             else:

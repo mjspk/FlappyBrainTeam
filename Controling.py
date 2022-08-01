@@ -11,7 +11,7 @@ class Controling:
         self.height = size[1]
         self.prev_direction = None
         self.stop = False
-        self.step = 7
+        self.step = 8
 
     def move_mouse(self, direction):
         pos = pyautogui.position()
@@ -243,6 +243,6 @@ class Controling:
                         self.y += self.step
                         pyautogui.moveTo(self.x, self.y)
 
-                t.sleep(0.01)
+                t.sleep(0.001)
                 if self.stop:
                     break
